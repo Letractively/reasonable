@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+<title>reasonable</title>
+<link rel="stylesheet" type="text/css" href="options.css">
+</head>
+<body>
+<h1><img src="icon_48.png" alt="logo">reasonable</h1>
+<form id="options" onsubmit="javascript:save();return false;">
+<ul>
+<li><input type="checkbox" id="showAltText"><label for="showAltText">Show alt text (if available) below pictures</label></li>
+<li><input type="checkbox" id="updatePosts"><label for="updatePosts">Check for new posts</label></li>
+<li><label for="blockList">Block list (comma-separated):</label><br><textarea id="blockList" rows="5" cols="40" spellcheck="false"></textarea></li>
+</ul>
+<input type="submit" value="Save">
+</form>
+<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="options.js"></script>
+</body>
+</html>

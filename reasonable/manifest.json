@@ -1,0 +1,20 @@
+{
+  "name": "reasonable",
+  "version": "0.9.1",
+  "description": "For a site called reason, you'd think...",
+  "icons": {
+    "16": "icon_16.png",
+    "32": "icon_32.png",
+    "48": "icon_48.png",
+    "128": "icon_128.png"
+  },
+  "options_page": "options.html",
+  "background_page": "background.html",
+  "content_scripts": [
+    {
+      "matches": ["http://reason.com/*", "http://reason.com/*"],
+      "css": ["reasonable.css"],
+      "js": ["jquery-1.4.2.min.js", "reasonable.js"]
+    }
+  ]
+}

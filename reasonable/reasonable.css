@@ -1,0 +1,56 @@
+div.ablePic {
+  border: 1px solid #ccc;
+  color: #333;
+  display: block;
+  float: right;
+  font-family: georgia;
+  line-height: 21px;
+  margin: 5px 0px 20px 20px;
+  max-width: 302px;
+  padding: 1px;
+}
+div.post div.ablePic > img {
+  border: none;
+  margin: 0;
+  max-width: 300px;
+  padding: 0;
+}
+div.ablePic {
+  font-size: 12px;
+  font-style: italic;
+}
+div.ableHighlight {
+  background-color: #eee;
+}
+.ableShow {
+  cursor: pointer;
+}
+div.ableDebug {
+  background-color: #fff;
+  border: 1px solid #ff6c11;
+  font-family: "courier new", monospace;
+  font-size: 10px;
+  height: 20em;
+  margin: 2px;
+  overflow-y: scroll;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 30em;
+}
+div.ableDebug p {
+  padding: 2px;
+}
+div.ableOptions {
+  background-color: #fff;
+  bottom: 0px;
+  margin-top: -2em;
+  position: absolute;
+  right: 0px;
+}
+div.troll {
+  color: #bbb;
+}
+div.troll a, div.troll .commentactions button.comment_reply {
+  color: #ffab88;
+}

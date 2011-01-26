@@ -1,0 +1,10 @@
+body, input {
+  font-family: verdana;
+}
+ul {
+  padding: 0;
+}
+li {
+  list-style-type: none;
+  padding-bottom: 1em;
+}
