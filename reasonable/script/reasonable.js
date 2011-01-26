@@ -87,7 +87,7 @@ function getSettings(response, defaults) {
 
 function altText(toggle) {
   if (toggle) {
-    $("img[alt^=]").each(function() {
+    $("div.post img[alt]").each(function() {
       var $img = $("<img>").attr("src", this.src);
       var $div = $("<div>").addClass("ablePic").append($img).append(this.alt);
       $(this).replaceWith($div);
