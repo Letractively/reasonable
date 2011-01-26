@@ -12,9 +12,10 @@
   "background_page": "background.html",
   "content_scripts": [
     {
-      "matches": ["http://reason.com/*", "http://reason.com/*"],
+      "matches": ["http://reason.com/*"],
       "css": ["reasonable.css"],
-      "js": ["jquery-1.4.2.min.js", "reasonable.js"]
+      "js": ["jquery-1.4.4.min.js", "reasonable.js"]
     }
-  ]
+  ],
+  "permissions": ["http://www.brymck.com/data/trolls.txt"]
 }

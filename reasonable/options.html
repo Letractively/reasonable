@@ -11,10 +11,15 @@
 <li><input type="checkbox" id="showAltText"><label for="showAltText">Show alt text (if available) below pictures</label></li>
 <li><input type="checkbox" id="updatePosts"><label for="updatePosts">Check for new posts</label></li>
 <li><label for="blockList">Block list (comma-separated):</label><br><textarea id="blockList" rows="5" cols="40" spellcheck="false"></textarea></li>
+<li class="hidden">
+<label for="recommendList">Recommended for blacklist:</label><br>
+<textarea id="recommendList" rows="5" cols="40" spellcheck="false"></textarea><br>
+<input type="button" value="Add All" onclick="javascript:addAllTrolls()">
+</li>
 </ul>
 <input type="submit" value="Save">
 </form>
-<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="options.js"></script>
 </body>
 </html>
