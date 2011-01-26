@@ -172,10 +172,28 @@ function blockTrolls() {
 
   $($("h2.commentheader strong")).each(function() {
     // Ignore reason's CDATA to generate A tags and retrieve poster name
-    var name = ($(this).children("a").size() > 0 ? $("a", this).text() : $(this).text());
+    var name;
+    var link = "";
+
+    if ($(this).children("a").size()) {
+      var $a = $("a", this);
+      name = $a.text();
+      link = $a.attr("href");
+    } else {
+      name = $(this).text();
+    }
+    
+    // Strip beginning and ending spaces
+    name = name.replace(/^\s|\s$/g, "");
+    
+    // For blogwhore filtering, get domain name if link is a URL
+    var match = link.match(/^https?:\/\/(www\.)?([^\/]+)?/i);
+    if (match) {
+      link = JSON.stringify(match[2]);
+    }
     
     // If poster is a troll, strip A tag, add troll class, and remove comment body
-    if (name in blockList) {
+    if (name in blockList || (link !== "" && link in blockList)) {
       $(this).html(name).closest("div").addClass("troll").children("p").remove();
     };
   });

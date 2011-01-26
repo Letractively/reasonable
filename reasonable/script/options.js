@@ -63,7 +63,6 @@ function load() {
 function save() {
   var temp = {};
   $("#options input[type!=submit], #options textarea").each(function() {
-    alert("hi");
     var $this = $(this);
     switch($this.attr("type")) {
       case "checkbox":

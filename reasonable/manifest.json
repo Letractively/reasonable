@@ -1,20 +1,20 @@
 {
   "name": "reasonable",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "For a site called reason, you'd think...",
   "icons": {
-    "16": "icon_16.png",
-    "32": "icon_32.png",
-    "48": "icon_48.png",
-    "128": "icon_128.png"
+    "16": "/image/icon_16.png",
+    "32": "/image/icon_32.png",
+    "48": "/image/icon_48.png",
+    "128": "/image/icon_128.png"
   },
   "options_page": "options.html",
   "background_page": "background.html",
   "content_scripts": [
     {
       "matches": ["http://reason.com/*"],
-      "css": ["reasonable.css"],
-      "js": ["jquery-1.4.4.min.js", "reasonable.js"]
+      "css": ["/style/reasonable.css"],
+      "js": ["/script/jquery-1.4.4.min.js", "/script/reasonable.js"]
     }
   ],
   "permissions": ["http://www.brymck.com/data/trolls.txt"]
