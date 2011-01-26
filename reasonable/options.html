@@ -6,19 +6,21 @@
 </head>
 <body>
 <h1><img src="/image/icon_48.png" alt="logo">reasonable</h1>
-<form id="options" onsubmit="javascript:save();return false;">
+<form id="options" onsubmit="javascript:return false;">
 <ul>
 <li><input type="checkbox" id="showAltText"><label for="showAltText">Show alt text (if available) below pictures</label></li>
 <li><input type="checkbox" id="updatePosts"><label for="updatePosts">Check for new posts</label></li>
 <li><label for="blockList">Block list (comma-separated):</label><br><textarea id="blockList" rows="5" cols="40" spellcheck="false"></textarea></li>
+</ul>
+</form>
+<ul>
 <li class="hidden">
 <label for="recommendList">Recommended for blacklist:</label><br>
 <textarea id="recommendList" rows="5" cols="40" spellcheck="false"></textarea><br>
 <input type="button" value="Add All" onclick="javascript:addAllTrolls()">
 </li>
 </ul>
-<input type="submit" value="Save">
-</form>
+<input type="button" value="Save" onclick="javascript:save()">
 <script type="text/javascript" src="/script/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="/script/options.js"></script>
 </body>

@@ -22,7 +22,7 @@ div.ablePic {
 div.ableHighlight {
   background-color: #eee;
 }
-.ableShow {
+.ableShow, .ignore {
   cursor: pointer;
 }
 div.ableDebug {

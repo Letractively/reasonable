@@ -74,6 +74,7 @@ function save() {
     }
   });
   localStorage["settings"] = JSON.stringify(temp);
+  alert("Saved successfully!");
   return false;
 }
 

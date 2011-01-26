@@ -1,11 +1,30 @@
+const trollListUrl = "http://www.brymck.com/data/trolls.txt";
+var recommendedList;
+
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   switch (request.type) {
     case "settings":
       if (localStorage["settings"]) {
-        sendResponse(localStorage["settings"]);
+        sendResponse({
+          settings: localStorage["settings"],
+          recommendedList: recommendedList
+        });
       } else {
-        sendResponse({});
+        sendResponse({recommendedList: recommendedList});
       }
+      break;
+    case "addTroll":
+      var temp = JSON.parse(localStorage["settings"]);
+      if (temp.blockList === "") {
+        temp.blockList = request.name;
+      } else {
+        temp.blockList += ", " + request.name;
+      }
+      if (request.link !== "") {
+        temp.blockList += ", " + request.link;
+      }
+      localStorage["settings"] = JSON.stringify(temp);
+      sendResponse({success: true});
       break;
     case "reset":
       localStorage["settings"] = request.settings;
@@ -16,3 +35,11 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       break;
   }
 });
+
+function main() {
+  $.get(trollListUrl, function(data) {
+    recommendedList = data.split("\n");
+  });
+}
+
+main();

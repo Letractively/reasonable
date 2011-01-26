@@ -2,6 +2,7 @@ const debugOn = false;
 var settings;
 var debug;
 var trolls = [];
+var recommendedList = [];
 
 function Debug(toggle) {
   this.on = toggle;
@@ -23,13 +24,48 @@ Debug.prototype.write = function(text) {
   }
 };
 
+function getName($strong) {
+  var temp;
+
+  if ($strong.children("a").size() > 0) {
+    temp = $("a", $strong).text();
+  } else {
+    temp = $strong.text();
+  }
+  
+  // Strip beginning and ending spaces
+  temp = temp.replace(/^\s|\s$/g, "");
+  
+  return temp;
+}
+
+function getLink($strong) {
+  var temp = "";
+
+  if ($strong.children("a").size() > 0) {
+    temp = $("a", $strong).attr("href");
+  }
+
+  // For blogwhore filtering, get domain name if link is a URL
+  var match = temp.match(/^https?:\/\/(www\.)?([^\/]+)?/i);
+  if (match) {
+    temp = JSON.stringify(match[2]);
+  } else {
+    temp = temp.replace("mailto:", "");
+  }
+
+  temp = temp.replace(/"/g, "");
+
+  return temp;
+}
+
 function getSettings(response, defaults) {
   var temp;
   var reset = false;
 
   // Use saved settings if they exist
   try {
-    temp = JSON.parse(response);
+    temp = JSON.parse(response.settings);
   } catch(e) {
     temp = {};
   }
@@ -103,8 +139,9 @@ function viewThread() {
   };
 
   $("h2.commentheader").each(function() {
-    var $pipe = $("<span>").addClass("pipe").text("|");
-    var $a = $("<a>").addClass("ableShow").click(function(e) {
+    var $pipe1 = $("<span>").addClass("pipe").text("|");
+    var $pipe2 = $("<span>").addClass("pipe").text("|");
+    var $show = $("<a>").addClass("ableShow").click(function(e) {
       var $this = $(this);
       if ($this.parent().parent().hasClass("ableHighlight")) {
         showAll.call(this);
@@ -112,7 +149,32 @@ function viewThread() {
         showDirects.call(this);
       }
     }).text("show direct only");
-    $(this).append($pipe).append($a);
+    var $ignore = $("<a>").addClass("ignore").click(function(e) {
+      var $strong = $(this).siblings("strong:first");
+      var name = getName($strong);
+      var link = getLink($strong);
+      if (confirm("This will harmonize all future posts under " + name +
+        (link !== "" ? " and " + link : "") + ". Continue?")) {
+        chrome.extension.sendRequest({type: "addTroll", name: name, link: link}, function(response) {
+          if (response.success == true) {
+            var temp = settings.blockList;
+            if (temp === "") {
+              temp = name;
+            } else {
+              temp += ", " + name;
+            }
+            if (link !== "") {
+              temp += ", " + link;
+            }
+            settings.blockList = temp;
+            blockTrolls();
+          } else {
+            alert("Adding troll failed! Try doing it manually in the options page for now. :(");
+          }
+        });
+      }
+    }).text("ignore");
+    $(this).append($pipe1).append($show).append($pipe2).append($ignore);
   });
 }
 
@@ -172,29 +234,12 @@ function blockTrolls() {
 
   $($("h2.commentheader strong")).each(function() {
     // Ignore reason's CDATA to generate A tags and retrieve poster name
-    var name;
-    var link = "";
+    var name = getName($(this));
+    var link = getLink($(this));
 
-    if ($(this).children("a").size()) {
-      var $a = $("a", this);
-      name = $a.text();
-      link = $a.attr("href");
-    } else {
-      name = $(this).text();
-    }
-    
-    // Strip beginning and ending spaces
-    name = name.replace(/^\s|\s$/g, "");
-    
-    // For blogwhore filtering, get domain name if link is a URL
-    var match = link.match(/^https?:\/\/(www\.)?([^\/]+)?/i);
-    if (match) {
-      link = JSON.stringify(match[2]);
-    }
-    
     // If poster is a troll, strip A tag, add troll class, and remove comment body
     if (name in blockList || (link !== "" && link in blockList)) {
-      $(this).html(name).closest("div").addClass("troll").children("p").remove();
+      $(this).html(name).closest("div").addClass("troll").children("p, blockquote").remove();
     };
   });
 }
@@ -210,21 +255,31 @@ function optionsLink() {
 }
 
 $(document).ready(function() {
+  var recommendedList;
+  
   debug = new Debug(debugOn);
 
   // Content scripts can't access local storage directly,
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
+    recommendedList = response.recommendedList;
     getSettings(response, [
       {name: "showAltText", value: true},
       {name: "updatePosts", value: false},
-      {name: "blockList", value: "Lonewacko, Max, Rather, shrike, ."}
+      {name: "blockList", value: recommendedList.join(", ")}
     ]);
-    blockTrolls();
     altText(settings.showAltText);
-    viewThread();
+
     if (window.location.href.indexOf("#comment") !== -1) {
+      blockTrolls();
+      viewThread();
       setTimeout(function() { updatePosts(toggle); }, 60000);
+    } else {
+      $("a[href=#commentcontainer]").click(function() {
+        blockTrolls();
+        viewThread();
+        setTimeout(function() { updatePosts(toggle); }, 60000);
+      });
     }
     optionsLink();
   });
