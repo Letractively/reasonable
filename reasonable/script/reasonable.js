@@ -2,7 +2,7 @@
 const pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
 const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-]+)/i;
 
-const debugOn = true;
+const debugOn = false;
 const collapse = "show direct thread";
 const uncollapse = "show all";
 const ignore = "ignore";
