@@ -139,6 +139,9 @@ function viewThread() {
   };
 
   $("h2.commentheader").each(function() {
+    var $strong = $("strong:first", this);
+    var name = getName($strong);
+    var link = getLink($strong);
     var $pipe1 = $("<span>").addClass("pipe").text("|");
     var $pipe2 = $("<span>").addClass("pipe").text("|");
     var $show = $("<a>").addClass("ableShow").click(function(e) {
@@ -149,11 +152,11 @@ function viewThread() {
         showDirects.call(this);
       }
     }).text("show direct only");
-    var $ignore = $("<a>").addClass("ignore").click(function(e) {
+    var $ignore = $("<a>").addClass("ignore").data("name", name).data("link", link).click(function(e) {
       var $this = $(this);
       var $strong = $this.siblings("strong:first");
-      var name = getName($strong);
-      var link = getLink($strong);
+      var name = $(this).data("name");
+      var link = $(this).data("link");
       if ($this.text() === "ignore") {
         chrome.extension.sendRequest({type: "addTroll", name: name, link: link}, function(response) {
           if (response.success == true) {
