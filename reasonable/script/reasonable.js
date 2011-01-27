@@ -1,4 +1,8 @@
-const debugOn = false;
+  // Test URLs and get YouTube YIDs
+const pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
+const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-]+)/i;
+
+const debugOn = true;
 const collapse = "show direct thread";
 const uncollapse = "show all";
 const ignore = "ignore";
@@ -7,7 +11,6 @@ const ignoreClass = "ignore";
 var settings;
 var debug;
 var trolls = [];
-var recommendedList = [];
 
 function Debug(toggle) {
   this.on = toggle;
@@ -91,10 +94,6 @@ function getSettings(response, defaults) {
 }
 
 function showMedia() {
-  // Test URLs and get YouTube YIDs
-  var pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
-  var youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-]+)/i;
-  
   if (settings.showPictures || settings.showYouTube) {
     $("div.com-block p a").each(function() {
       var $this = $(this);
@@ -187,7 +186,7 @@ function viewThread() {
     $("html, body").animate({scrollTop: $(window).scrollTop() + showHeight + "px"});
   };
 
-  $("h2.commentheader").each(function() {
+  $("h2.commentheader:not(:has(a.ignore))").each(function() {
     var $strong = $("strong:first", this);
     var name = getName($strong);
     var link = getLink($strong);
@@ -245,8 +244,8 @@ function viewThread() {
   });
 }
 
-function updatePosts(toggle) {
-  if (toggle) {
+function updatePosts() {
+  if (settings.updatePosts) {
     $.ajax({
       url: window.location.href,
       success: function(data) {
@@ -257,37 +256,42 @@ function updatePosts(toggle) {
         var $curNode;
         var $prevNode = null;
         var $container = $("#commentcontainer");
+        var updateLinks = false;
 
         while (match != null) {
           var ids = idRe.exec(match);
-          match = re.exec(data);
           comments.push({html: match, id: ids[1]});
+          match = re.exec(data);
         }
 
         debug.write("Loaded " + comments.length + " comments, compared to " + $container.children().length);
         
         $.each(comments, function() {
+          var html = this.html.toString().replace(/\/\/[\s\S]*?\]\]>/, "temp");
           $curNode = $("#" + this.id);
           
-          if ($curNode.length === 0) {
+          if ($curNode.size() === 0) {
+            updateLinks = true;
             debug.write("Comment " + this.id + " doesn't exist");
-            var $addNode = $(this.html);
-            if ($prevNode !== null) {
-              debug.write("Inserting after " + $prevNode.attr("id"))
-              $prevNode.after($addNode);
-              $prevNode = $addNode();
+            if ($prevNode !=  null) {
+              debug.write("Inserting after " + $prevNode.attr("id"));
+              $prevNode.after(html);
+              $prevNode = $prevNode.next();
             } else {
-              $container.append($addNode);
+              $container.append(html);
               $prevNode = $container.children("div:first");
             }
           } else {
-            $prevNode = $curNode;
+           $prevNode = $curNode;
           }
         });
+        
+        viewThread();
+        blockTrolls(false);
       }
     });
 
-    setTimeout(function() { updatePosts(toggle); }, 60000);
+    setTimeout(function() { updatePosts(); }, 60000);
   }
 }
 
@@ -333,14 +337,12 @@ function optionsLink() {
 }
 
 $(document).ready(function() {
-  var recommendedList;
-  
   debug = new Debug(debugOn);
 
   // Content scripts can't access local storage directly,
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
-    recommendedList = response.recommendedList;
+    var recommendedList = response.recommendedList;
     getSettings(response, [
       {name: "showAltText", value: true},
       {name: "updatePosts", value: false},
@@ -354,12 +356,12 @@ $(document).ready(function() {
     if (window.location.href.indexOf("#comment") !== -1) {
       viewThread();
       blockTrolls(false);
-      setTimeout(function() { updatePosts(toggle); }, 60000);
+      setTimeout(function() { updatePosts(); }, 60000);
     } else {
       $("a[href=#commentcontainer]").click(function() {
         viewThread();
         blockTrolls(false);
-        setTimeout(function() { updatePosts(toggle); }, 60000);
+        setTimeout(function() { updatePosts(); }, 60000);
       });
     }
     optionsLink();
