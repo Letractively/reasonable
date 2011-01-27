@@ -150,11 +150,11 @@ function viewThread() {
       }
     }).text("show direct only");
     var $ignore = $("<a>").addClass("ignore").click(function(e) {
-      var $strong = $(this).siblings("strong:first");
+      var $this = $(this);
+      var $strong = $this.siblings("strong:first");
       var name = getName($strong);
       var link = getLink($strong);
-      if (confirm("This will harmonize all future posts under " + name +
-        (link !== "" ? " and " + link : "") + ". Continue?")) {
+      if ($this.text() === "ignore") {
         chrome.extension.sendRequest({type: "addTroll", name: name, link: link}, function(response) {
           if (response.success == true) {
             var temp = settings.blockList;
@@ -167,9 +167,24 @@ function viewThread() {
               temp += ", " + link;
             }
             settings.blockList = temp;
-            blockTrolls();
+            blockTrolls(false);
           } else {
             alert("Adding troll failed! Try doing it manually in the options page for now. :(");
+          }
+        });
+      } else {
+        chrome.extension.sendRequest({type: "removeTroll", name: name, link: link}, function(response) {
+          if (response.success == true) {
+            var temp = settings.blockList;
+            temp = temp.replace(name);
+            if (link) {
+              temp = temp.replace(link);
+            }
+            temp = temp.replace(/^[,\s]*|[,\s]$/g, "");
+            settings.blockList = temp;
+            blockTrolls(true);
+          } else {
+            alert("Removing troll failed! Try doing it manually in the options page for now. :(");
           }
         });
       }
@@ -224,7 +239,7 @@ function updatePosts(toggle) {
   }
 }
 
-function blockTrolls() {
+function blockTrolls(unignore) {
   // Build object literal containing a list of trolls
   var temp = settings.blockList.replace(/,\s/g, ",").split(",");
   var blockList = {};
@@ -237,10 +252,13 @@ function blockTrolls() {
     var name = getName($(this));
     var link = getLink($(this));
 
-    // If poster is a troll, strip A tag, add troll class, and remove comment body
     if (name in blockList || (link !== "" && link in blockList)) {
-      $(this).html(name).closest("div").addClass("troll").children("p, blockquote").remove();
-    };
+      // If poster is a troll, strip A tag, add troll class, and remove comment body
+      $(this).html(name).siblings("a.ignore").text("unignore").closest("div").addClass("troll").children("p, blockquote").hide();
+    } else if (unignore && $(this).siblings("a.ignore").text() === "unignore") {
+      // Unhide unignored trolls
+      $(this).siblings("a.ignore").text("ignore").closest("div").removeClass("troll").children("p, blockquote").slideDown();
+    }
   });
 }
 
@@ -271,13 +289,13 @@ $(document).ready(function() {
     altText(settings.showAltText);
 
     if (window.location.href.indexOf("#comment") !== -1) {
-      blockTrolls();
       viewThread();
+      blockTrolls(false);
       setTimeout(function() { updatePosts(toggle); }, 60000);
     } else {
       $("a[href=#commentcontainer]").click(function() {
-        blockTrolls();
         viewThread();
+        blockTrolls(false);
         setTimeout(function() { updatePosts(toggle); }, 60000);
       });
     }
