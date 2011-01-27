@@ -1,4 +1,9 @@
 const debugOn = false;
+const collapse = "show direct thread";
+const uncollapse = "show all";
+const ignore = "ignore";
+const unignore = "unignore";
+const ignoreClass = "ignore";
 var settings;
 var debug;
 var trolls = [];
@@ -85,8 +90,40 @@ function getSettings(response, defaults) {
   }
 }
 
-function altText(toggle) {
-  if (toggle) {
+function showMedia() {
+  // Test URLs and get YouTube YIDs
+  var pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
+  var youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-]+)/i;
+  
+  $("div.com-block p a").each(function() {
+    var $this = $(this);
+    if (settings.showPictures) {
+      if (pictureRe.test($this.attr("href"))) {
+        var $img = $("<img>").addClass("ableCommentPic").attr("src", $this.attr("href"));
+        $this.parent().after($img);
+      }
+    }
+    if (settings.showYouTube) {
+      var matches = youtubeRe.exec($this.attr("href"));
+      
+      if (matches != null) {
+        var $youtube = $("<iframe>").addClass("youtube-player").attr({
+          title: "YouTube video player",
+          type: "text/html",
+          width: "480",
+          height: "390",
+          src: "http://www.youtube.com/embed/" + matches[1],
+          frameborder: "0"
+        });
+        
+        $this.parent().after($youtube);
+      }
+    }
+  });
+}
+
+function altText() {
+  if (settings.showAltText) {
     $("div.post img[alt]").each(function() {
       var $img = $("<img>").attr("src", this.src);
       var $div = $("<div>").addClass("ablePic").append($img).append(this.alt);
@@ -105,11 +142,11 @@ function viewThread() {
     
     // Get last digit for depth, ignoring the added class for trolls
     var depth = parseInt($comment.attr("class").replace(" troll", "").substr(-1));
-    $comment.addClass("ableHighlight").find(".ableShow").text("show all");
+    $comment.addClass("ableHighlight").find(".ableShow").text(uncollapse);
     while (depth > 0 && iter <= 100) {
       $comment = $comment.prev();
       if (parseInt($comment.attr("class").replace(" troll", "").substr(-1)) === depth - 1) {
-        $comment.addClass("ableHighlight").find(".ableShow").text("show all");
+        $comment.addClass("ableHighlight").find(".ableShow").text(uncollapse);
         depth--;
       } else {
         hideHeight += $comment.height();
@@ -134,7 +171,7 @@ function viewThread() {
       // Have to reference data attribute because .height() will return 0
       showHeight += $this.data("height");
     });
-    $(".ableHighlight").removeClass("ableHighlight").find(".ableShow").text("show direct only");
+    $(".ableHighlight").removeClass("ableHighlight").find(".ableShow").text(collapse);
     $("html, body").animate({scrollTop: $(window).scrollTop() + showHeight + "px"});
   };
 
@@ -151,13 +188,13 @@ function viewThread() {
       } else {
         showDirects.call(this);
       }
-    }).text("show direct only");
-    var $ignore = $("<a>").addClass("ignore").data("name", name).data("link", link).click(function(e) {
+    }).text(collapse);
+    var $ignore = $("<a>").addClass(ignoreClass).data("name", name).data("link", link).click(function(e) {
       var $this = $(this);
       var $strong = $this.siblings("strong:first");
       var name = $(this).data("name");
       var link = $(this).data("link");
-      if ($this.text() === "ignore") {
+      if ($this.text() === ignore) {
         chrome.extension.sendRequest({type: "addTroll", name: name, link: link}, function(response) {
           if (response.success == true) {
             var temp = settings.blockList;
@@ -170,7 +207,7 @@ function viewThread() {
               temp += ", " + link;
             }
             settings.blockList = temp;
-            blockTrolls(false);
+            blockTrolls(true);
           } else {
             alert("Adding troll failed! Try doing it manually in the options page for now. :(");
           }
@@ -191,7 +228,7 @@ function viewThread() {
           }
         });
       }
-    }).text("ignore");
+    }).text(ignore);
     $(this).append($pipe1).append($show).append($pipe2).append($ignore);
   });
 }
@@ -242,25 +279,33 @@ function updatePosts(toggle) {
   }
 }
 
-function blockTrolls(unignore) {
+function blockTrolls(smoothTransitions) {
   // Build object literal containing a list of trolls
   var temp = settings.blockList.replace(/,\s/g, ",").split(",");
   var blockList = {};
+  var showHeight = 0;
   for (var i = 0; i < temp.length; i++) {
     blockList[temp[i]] = "";
   }
 
   $($("h2.commentheader strong")).each(function() {
-    // Ignore reason's CDATA to generate A tags and retrieve poster name
-    var name = getName($(this));
-    var link = getLink($(this));
+    var $this = $(this);
+    var $ignore = $this.siblings("a." + ignoreClass);
+    var name = $ignore.data("name");
+    var link = $ignore.data("link");
 
     if (name in blockList || (link !== "" && link in blockList)) {
       // If poster is a troll, strip A tag, add troll class, and remove comment body
-      $(this).html(name).siblings("a.ignore").text("unignore").closest("div").addClass("troll").children("p, blockquote").hide();
-    } else if (unignore && $(this).siblings("a.ignore").text() === "unignore") {
+      var $body = $this.html(name).siblings("a.ignore").text(unignore).closest("div").addClass("troll").children("p, blockquote");
+      
+      if (smoothTransitions) {
+        $body.slideUp();
+      } else {
+        $body.hide();
+      }
+    } else if (smoothTransitions && $ignore.text() === unignore) {
       // Unhide unignored trolls
-      $(this).siblings("a.ignore").text("ignore").closest("div").removeClass("troll").children("p, blockquote").slideDown();
+      $this.siblings("a.ignore").text(ignore).closest("div").removeClass("troll").children("p, blockquote").slideDown();
     }
   });
 }
@@ -287,9 +332,12 @@ $(document).ready(function() {
     getSettings(response, [
       {name: "showAltText", value: true},
       {name: "updatePosts", value: false},
+      {name: "showPictures", value: true},
+      {name: "showYouTube", value: true},
       {name: "blockList", value: recommendedList.join(", ")}
     ]);
-    altText(settings.showAltText);
+    altText();
+    showMedia();
 
     if (window.location.href.indexOf("#comment") !== -1) {
       viewThread();

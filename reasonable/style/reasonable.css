@@ -4,6 +4,8 @@ div.ablePic {
   display: block;
   float: right;
   font-family: georgia;
+  font-size: 12px;
+  font-style: italic;
   line-height: 21px;
   margin: 5px 0px 20px 20px;
   max-width: 302px;
@@ -14,10 +16,6 @@ div.post div.ablePic > img {
   margin: 0;
   max-width: 300px;
   padding: 0;
-}
-div.ablePic {
-  font-size: 12px;
-  font-style: italic;
 }
 div.ableHighlight {
   background-color: #eee;
@@ -53,4 +51,11 @@ div.troll {
 }
 div.troll a, div.troll .commentactions button.comment_reply {
   color: #ffab88;
+}
+iframe.youtube-player {
+  display: block;
+}
+img.ableCommentPic {
+  max-height: 40em;
+  max-width: 100%;
 }

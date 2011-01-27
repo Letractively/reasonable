@@ -10,13 +10,18 @@
 <ul>
 <li><input type="checkbox" id="showAltText"><label for="showAltText">Show alt text (if available) below pictures</label></li>
 <li><input type="checkbox" id="updatePosts"><label for="updatePosts">Check for new posts</label></li>
-<li><label for="blockList">Block list (comma-separated):</label><br><textarea id="blockList" rows="5" cols="40" spellcheck="false"></textarea></li>
+<li><input type="checkbox" id="showPictures"><label for="showPictures">Show pictures in comments</label></li>
+<li><input type="checkbox" id="showYouTube"><label for="showYouTube">Show YouTube in comments</label></li>
+<li>
+<label for="blockList">Block list (comma-separated):</label><br>
+<textarea id="blockList" rows="5" cols="80" spellcheck="false"></textarea>
+</li>
 </ul>
 </form>
 <ul>
 <li class="hidden">
 <label for="recommendList">Recommended for blacklist:</label><br>
-<textarea id="recommendList" rows="5" cols="40" spellcheck="false"></textarea><br>
+<textarea id="recommendList" rows="5" cols="80" spellcheck="false"></textarea><br>
 <input type="button" value="Add All" onclick="javascript:addAllTrolls()">
 </li>
 </ul>

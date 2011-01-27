@@ -28,9 +28,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       break;
     case "removeTroll":
       var temp = JSON.parse(localStorage["settings"]);
-      temp.blockList = temp.blockList.replace(request.name);
+      temp.blockList = temp.blockList.replace(request.name, "");
       if (request.link !== "") {
-        temp.blockList = temp.blockList.replace(request.link);
+        temp.blockList = temp.blockList.replace(request.link, "");
       }
       // Delete leading and trailing apostrophes
       temp.blockList = temp.blockList.replace(/^[,\s]*|[,\s]*$/g, "");
