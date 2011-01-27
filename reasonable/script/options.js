@@ -1,6 +1,11 @@
 const trollListUrl = "http://www.brymck.com/data/trolls.txt";
 var $blockList = $("#blockList");
 var $recommendList = $("#recommendList");
+var $save = $("#saveButton");
+
+function enableSave() {
+  $save.removeAttr("disabled");
+}
 
 function addAllTrolls() {
   var temp = $blockList.val();
@@ -13,6 +18,7 @@ function addAllTrolls() {
   
   $blockList.val(temp);
   $recommendList.val("").parents("li.hidden:first").slideUp();
+  enableSave();
 }
 
 function updateTrollList() {
@@ -74,6 +80,7 @@ function save() {
     }
   });
   localStorage["settings"] = JSON.stringify(temp);
+  $save.attr("disabled", "disabled");
   alert("Saved successfully!");
   return false;
 }

@@ -8,13 +8,13 @@
 <h1><img src="/image/icon_48.png" alt="logo">reasonable</h1>
 <form id="options" onsubmit="javascript:return false;">
 <ul>
-<li><input type="checkbox" id="showAltText"><label for="showAltText">Show alt text (if available) below pictures</label></li>
-<li><input type="checkbox" id="updatePosts"><label for="updatePosts">Check for new posts</label></li>
-<li><input type="checkbox" id="showPictures"><label for="showPictures">Show pictures in comments</label></li>
-<li><input type="checkbox" id="showYouTube"><label for="showYouTube">Show YouTube in comments</label></li>
+<li><input type="checkbox" id="showAltText" onclick="enableSave()"><label for="showAltText">Show alt text (if available) below pictures</label></li>
+<li><input type="checkbox" id="updatePosts" onclick="enableSave()"><label for="updatePosts">Check for new posts</label></li>
+<li><input type="checkbox" id="showPictures" onclick="enableSave()"><label for="showPictures">Show pictures in comments</label></li>
+<li><input type="checkbox" id="showYouTube" onclick="enableSave()"><label for="showYouTube">Show YouTube in comments</label></li>
 <li>
 <label for="blockList">Block list (comma-separated):</label><br>
-<textarea id="blockList" rows="5" cols="80" spellcheck="false"></textarea>
+<textarea id="blockList" rows="5" cols="80" spellcheck="false" onchange="enableSave()"></textarea>
 </li>
 </ul>
 </form>
@@ -25,7 +25,7 @@
 <input type="button" value="Add All" onclick="javascript:addAllTrolls()">
 </li>
 </ul>
-<input type="button" value="Save" onclick="javascript:save()">
+<input type="button" id="saveButton" value="Save" onclick="javascript:save()" disabled>
 <script type="text/javascript" src="/script/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="/script/options.js"></script>
 </body>
