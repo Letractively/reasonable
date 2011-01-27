@@ -95,31 +95,43 @@ function showMedia() {
   var pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
   var youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-]+)/i;
   
-  $("div.com-block p a").each(function() {
-    var $this = $(this);
-    if (settings.showPictures) {
-      if (pictureRe.test($this.attr("href"))) {
-        var $img = $("<img>").addClass("ableCommentPic").attr("src", $this.attr("href"));
-        $this.parent().after($img);
+  if (settings.showPictures || settings.showYouTube) {
+    $("div.com-block p a").each(function() {
+      var $this = $(this);
+      if (settings.showPictures) {
+        if (pictureRe.test($this.attr("href"))) {
+          var $img = $("<img>").addClass("ableCommentPic").attr("src", $this.attr("href"));
+          $this.parent().after($img);
+        }
       }
-    }
-    if (settings.showYouTube) {
-      var matches = youtubeRe.exec($this.attr("href"));
-      
-      if (matches != null) {
-        var $youtube = $("<iframe>").addClass("youtube-player").attr({
-          title: "YouTube video player",
-          type: "text/html",
-          width: "480",
-          height: "390",
-          src: "http://www.youtube.com/embed/" + matches[1],
-          frameborder: "0"
-        });
+      if (settings.showYouTube) {
+        var matches = youtubeRe.exec($this.attr("href"));
         
-        $this.parent().after($youtube);
+        if (matches != null) {
+          var $youtube = $("<iframe>").addClass("youtube-player").attr({
+            title: "YouTube video player",
+            type: "text/html",
+            width: "480",
+            height: "390",
+            src: "http://www.youtube.com/embed/" + matches[1],
+            frameborder: "0"
+          });
+          
+          $this.parent().after($youtube);
+        }
       }
-    }
-  });
+    });
+    
+    $("div.com-block p:not(:has(a)):contains(http)").each(function() {
+      var $this = $(this);
+      if (settings.showPictures) {
+        if (pictureRe.test($this.text())) {
+          var $img = $("<img>").addClass("ableCommentPic").attr("src", $this.text());
+          $this.after($img);
+        }
+      }
+    });
+  }
 }
 
 function altText() {
