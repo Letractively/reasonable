@@ -52,13 +52,26 @@ function load() {
   try {
     var settings = JSON.parse(localStorage["settings"]);
     $.each(settings, function(key, value) {
-      var $input = $("#" + key);
-      switch($input.attr("type")) {
-        case "checkbox":
-          $input.attr("checked", value);
+      var $option = $("#" + key);
+      switch ($option.attr("id")) {
+        case "blacklist":
+        case "whitelist":
+          var tempList = value.split(/,\s/);
+          $.each(tempList, function(key, troll) {
+            $option.append($("<option>").val(troll).text(troll));
+          });
+          break;
+        case "reclist":
+          // do later
+          break;
+        case "showAltText":
+        case "showPictures":
+        case "showYouTube":
+        case "updatePosts":
+          $option.attr("checked", value);
           break;
         default:
-          $input.val(value);
+          $option.val(value);
           break;
       }
     });

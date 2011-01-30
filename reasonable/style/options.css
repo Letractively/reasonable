@@ -2,6 +2,11 @@ body, input {
   font-family: verdana;
   font-size: 14px;
 }
+h3 {
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0;
+}
 ul {
   padding: 0;
 }
@@ -11,4 +16,11 @@ li {
 }
 .hidden {
   display: none;
+}
+select[multiple] {
+  width: 20em;
+}
+ul#trollLists * {
+  display: inline;
+  list-style-type: none;
 }

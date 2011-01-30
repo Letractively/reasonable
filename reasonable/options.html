@@ -25,6 +25,32 @@
 <input type="button" value="Add All" onclick="javascript:addAllTrolls()">
 </li>
 </ul>
+<ul id="trollLists">
+<li>
+<div>
+<label for="blacklist">Blacklist:</label>
+<br>
+<select id="blacklist" multiple></select>
+</div>
+</li>
+<li><button>←</button></li>
+<li>
+<div>
+<label for="reclist">Recommended:</label>
+<br>
+<select id="reclist" multiple></select>
+</div>
+</li>
+<li><button>→</button></li>
+<li>
+<div>
+<label for="whitelist">Whitelist:</label>
+<br>
+<select id="whitelist" multiple></select>
+</div>
+</li>
+</ul>
+
 <input type="button" id="saveButton" value="Save" onclick="javascript:save()" disabled>
 <script type="text/javascript" src="/script/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="/script/options.js"></script>
