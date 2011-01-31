@@ -8,5 +8,7 @@ hg addremove
 echo.
 set /p message=Commit message: 
 hg commit -m "%message%"
+echo.
+echo Pushing to server...
 hg push
 ping -n 2 127.0.0.1>nul
