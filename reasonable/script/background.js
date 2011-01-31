@@ -48,7 +48,16 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       break;
     case "reset":
       $.each(request.settings, function(key, value) {
-        localStorage[key] = (key === "trolls" ? JSON.stringify(value) : value);
+        if (key === "trolls") {
+          // Make sure we don't accidentally delete any whitelisted people
+          var temp = JSON.parse(localStorage.trolls);
+          for (var key in value) {
+            temp[key] = value[key];
+          }
+          localStorage.trolls = JSON.stringify(temp);
+        } else {
+          localStorage[key] = value;
+        }
       });
       break;
     default:

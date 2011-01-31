@@ -65,13 +65,15 @@ function getSettings(response, defaults) {
       var arr = JSON.parse(temp.trolls);
       temp.trolls = {};
       for (var key in arr) {
-        if (arr[key] !== "white") {
+        if (arr[key] === "black" || (temp.hideAuto && arr[key] === "auto")) {
           temp.trolls[key] = arr[key];
         }
       }
-      for (var key in this.value) {
-        if (!(key in temp.trolls)) {
-          temp.trolls[key] = "auto";
+      if (temp.hideAuto) {
+        for (var key in this.value) {
+          if (!(key in temp.trolls)) {
+            temp.trolls[key] = "auto";
+          }
         }
       }
     }
@@ -211,12 +213,8 @@ function viewThread() {
       } else {
         chrome.extension.sendRequest({type: "removeTroll", name: name, link: link}, function(response) {
           if (response.success == true) {
-            if (name in settings.trolls) {
-              delete settings.trolls[name];
-            }
-            if (link in settings.trolls) {
-              delete settings.trolls[link];
-            }
+            delete settings.trolls[name];
+            delete settings.trolls[link];
             blockTrolls(true);
           } else {
             alert("Removing troll failed! Try doing it manually in the options page for now. :(");
@@ -308,6 +306,7 @@ function main() {
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
     getSettings(response, [
+      {name: "hideAuto", value: true},
       {name: "showAltText", value: true},
       {name: "showUnignore", value: true},
       {name: "updatePosts", value: false},

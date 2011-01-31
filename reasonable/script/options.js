@@ -4,6 +4,17 @@ var $troll = $("#troll");
 var trollList = {};
 
 function sortTrolls(trolls) {
+  var sortFunction = function(x, y) {
+    var a = String(x).toUpperCase();
+    var b = String(y).toUpperCase();
+    if (a > b) {
+      return 1;
+    } else if (a < b) {
+      return -1;
+    } else {
+      return 0;
+    }
+  };
   var black = [];
   var white = [];
   var auto = [];
@@ -32,9 +43,9 @@ function sortTrolls(trolls) {
     }
   });
   
-  black.sort();
-  white.sort();
-  auto.sort();
+  black.sort(sortFunction);
+  white.sort(sortFunction);
+  auto.sort(sortFunction);
   
   $.each(black, function(index, value) { temp[value] = "black"; });
   $.each(auto, function(index, value) { temp[value] = "auto"; });

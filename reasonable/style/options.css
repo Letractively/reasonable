@@ -2,19 +2,13 @@ body, input {
   font-family: verdana;
   font-size: 12px;
 }
-div#container {
-  width: 60em;
-}
-div#leftside {
-  float: left;
-  margin-bottom: 1em;
-  padding-bottom: 1em;
-}
-div#rightside {
-  float: left;
-  padding-left: 1em;
-  margin-bottom: 1em;
-  padding-bottom: 1em;
+/*
+  Yes, I'm aware that I'm using tables for page layout.
+  It's much cleaner than using divs because Chrome loves wrapping
+  them to the next line when in popup mode
+*/
+td#rightside {
+  min-width: 25em;
 }
 h1 span.able {
   color: #676799;
@@ -51,24 +45,41 @@ tfoot {
 .remove:hover {
   color: #f00;
 }
+#trolls tr:hover td {
+  background-color: #ffd5c4;
+}
 .controll {
   cursor: pointer;
+  font-size: 10px;
   padding: 0 2px;
   text-transform: uppercase;
 }
+
+/* Blacklist */
 .controll.black {
   background-color: #ddd;
   color: #fff;
 }
-.controll.black.selected {
+#trolls tr:hover .black.selected, .controll.black.selected {
   background-color: #000;
 }
+#trolls tr:hover .black {
+  background-color: #ddb3a2;
+  color: #ffd5c4;
+}
+
+/* Whitelist */
 .controll.white {
   color: #ccc;
 }
-.controll.white.selected {
+#trolls tr:hover .white.selected, .controll.white.selected {
   color: #000;
 }
+#trolls tr:hover .white {
+  color: #cca291;
+}
+
+/* Autolist */
 .controll.auto {
   background-color: #ffd5c4;
   color: #fff;
@@ -76,6 +87,15 @@ tfoot {
 .controll.auto.selected {
   background-color: #ff6c11;
 }
+#trolls tr:hover .controll.auto {
+  background-color: #ffab89;
+  color: #fff;
+}
+#trolls tr:hover .controll.auto.selected {
+  background-color: #ff4608;
+  color: #fff;
+}
+
 button {
   background-color: #e8e8f0;
   border: 1px solid #aeafcb;
@@ -87,6 +107,7 @@ button {
 }
 button:hover {
   background-color: #dcdce8;
+  cursor: pointer;
   -webkit-box-shadow: inset 0 1px 3px #dcdde9, inset 0 -1em #cbcbdd, 0 0 3px #8586b1;
 }
 button:active {
@@ -95,6 +116,7 @@ button:active {
 }
 #save {
   font-size: 1.5em;
+  margin-left: 3em;
 }
 #troll {
   line-height: 16px;

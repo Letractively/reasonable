@@ -6,8 +6,12 @@
 </head>
 <body>
 <h1><img src="/image/icon_48.png" alt="logo">reason<span class="able">able</span></h1>
-<div id="container">
-<div id="leftside">
+<p>Blacklist trolls you don't want to see again, whitelist folks you do, and leave on auto to let the update scripty do its thing.</p>
+<!--Yes, this is a table-based layout. Chrome was wrapping divs in the popup.-->
+<table id="container">
+<tbody>
+<tr>
+<td id="leftside">
 <table>
 <thead>
 <tr>
@@ -21,19 +25,21 @@
 </table>
 <br>
 <input type="text" id="troll" placeholder="Troll"><button id="add" onclick="javascript:addTroll()">Add</button><br>
-</div>
-<div id="rightside">
+</td>
+<td id="rightside">
 <ul id="options">
-<li><input type="checkbox" id="showAltText" onclick="enableSave()"><label for="showAltText">Show alt text (if available) below pictures</label></li>
-<li><input type="checkbox" id="showUnignore" onclick="enableSave()"><label for="showUnignore">Show unignore link for trolls</label></li>
-<li><input type="checkbox" id="showPictures" onclick="enableSave()"><label for="showPictures">Show pictures in comments</label></li>
-<li><input type="checkbox" id="showYouTube" onclick="enableSave()"><label for="showYouTube">Show YouTube in comments</label></li>
-<li><input type="checkbox" id="updatePosts" onclick="enableSave()"><label for="updatePosts">Check for new posts (beta)</label></li>
+<li><input type="checkbox" id="hideAuto"><label for="hideAuto">Hide trolls automatically based on <a href="http://www.brymck.com/reasonable/trolls.json">remote list</a></label></li>
+<li><input type="checkbox" id="showAltText"><label for="showAltText">Show alt text (if available) below pictures</label></li>
+<li><input type="checkbox" id="showUnignore"><label for="showUnignore">Show unignore link for trolls</label></li>
+<li><input type="checkbox" id="showPictures"><label for="showPictures">Show pictures in comments</label></li>
+<li><input type="checkbox" id="showYouTube"><label for="showYouTube">Show YouTube in comments</label></li>
+<li><input type="checkbox" id="updatePosts"><label for="updatePosts">Check for new posts (beta)</label></li>
 </ul>
 <button id="save" onclick="javascript:save()">Save</button>
-</div>
-</div>
-<br>
+</td>
+</tr>
+</tbody>
+</table>
 <script type="text/javascript" src="/script/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="/script/options.js"></script>
 </body>
