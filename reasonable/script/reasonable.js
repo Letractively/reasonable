@@ -2,35 +2,13 @@
 const pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
 const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
 
-const debugOn = false;
 const collapse = "show direct thread";
 const uncollapse = "show all";
 const ignore = "ignore";
 const unignore = "unignore";
 const ignoreClass = "ignore";
 var settings;
-var debug;
 var trolls = [];
-
-function Debug(toggle) {
-  this.on = toggle;
-  
-  if (this.on) {
-    var _this = this;
-    this.$div = $("<div>").addClass("ableDebug").attr("id", "debug").css("top", $("body").scrollTop() + "px");
-    $("body").append(this.$div);
-
-    $(document).scroll(function() {
-      _this.$div.css("top", $("body").scrollTop() + "px");
-    });
-  }
-}
-
-Debug.prototype.write = function(text) {
-  if (this.on) {
-    this.$div.append($("<p>").text(text)).attr("scrollTop", this.$div.attr("scrollHeight") - this.$div.height());
-  }
-};
 
 function getName($strong) {
   var temp;
@@ -263,8 +241,6 @@ function updatePosts() {
           comments.push({html: match, id: ids[1]});
           match = re.exec(data);
         }
-
-        debug.write("Loaded " + comments.length + " comments, compared to " + $container.children().length);
         
         $.each(comments, function() {
           var html = this.html.toString().replace(/\/\/[\s\S]*?\]\]>/, "temp");
@@ -272,9 +248,7 @@ function updatePosts() {
           
           if ($curNode.size() === 0) {
             updateLinks = true;
-            debug.write("Comment " + this.id + " doesn't exist");
             if ($prevNode !=  null) {
-              debug.write("Inserting after " + $prevNode.attr("id"));
               $prevNode.after(html);
               $prevNode = $prevNode.next();
             } else {
@@ -311,8 +285,11 @@ function blockTrolls(smoothTransitions) {
     var link = $ignore.data("link");
 
     if (name in blockList || (link !== "" && link in blockList)) {
-      // If poster is a troll, strip A tag, add troll class, and remove comment body
+      // If poster is a troll, strip A tag, add troll class, and hide comment body
       var $body = $this.html(name).siblings("a.ignore").text(unignore).closest("div").addClass("troll").children("p, blockquote");
+      if (!settings.showUnignore) {
+        $this.siblings("a.ignore").hide().prev("span.pipe").hide();
+      }
       
       if (smoothTransitions) {
         $body.slideUp();
@@ -326,28 +303,18 @@ function blockTrolls(smoothTransitions) {
   });
 }
 
-function optionsLink() {
-  // Show link to options page in bottom right corner of screen
-  var $link = $("<div>").addClass("ableOptions").css("top", $("body").scrollTop() + $(window).height() + "px")
-    .append($("<a>").attr({href: chrome.extension.getURL("options.html"), id: "optionsLink", target: "_blank"}).text("Set options"));
-  $("body").append($link);
-  $(document).scroll(function() {
-    $link.css("top", $("body").scrollTop() + $(window).height() + "px");
-  });
-}
-
 $(document).ready(function() {
-  debug = new Debug(debugOn);
-
   // Content scripts can't access local storage directly,
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
     var recommendedList = response.recommendedList;
     getSettings(response, [
       {name: "showAltText", value: true},
+      {name: "showUnignore", value: true},
       {name: "updatePosts", value: false},
       {name: "showPictures", value: true},
       {name: "showYouTube", value: true},
+      {name: "trolls", value: {}},
       {name: "blockList", value: recommendedList.join(", ")}
     ]);
     altText();
@@ -364,6 +331,5 @@ $(document).ready(function() {
         setTimeout(function() { updatePosts(); }, 60000);
       });
     }
-    optionsLink();
   });
 });

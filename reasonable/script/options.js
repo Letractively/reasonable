@@ -50,10 +50,13 @@ function updateTrollList() {
 
 function load() {
   try {
-    var settings = JSON.parse(localStorage["settings"]);
+    var settings = JSON.parse(localStorage);
     $.each(settings, function(key, value) {
       var $option = $("#" + key);
       switch ($option.attr("id")) {
+        case "trolls":
+          var trolls = JSON.
+          break;
         case "blacklist":
         case "whitelist":
           var tempList = value.split(/,\s/);
@@ -65,6 +68,7 @@ function load() {
           // do later
           break;
         case "showAltText":
+        case "showUnignore":
         case "showPictures":
         case "showYouTube":
         case "updatePosts":
@@ -92,9 +96,10 @@ function save() {
         break;
     }
   });
-  localStorage["settings"] = JSON.stringify(temp);
+  localStorage = JSON.stringify(temp);
   $save.attr("disabled", "disabled");
   alert("Saved successfully!");
+  window.close();
   return false;
 }
 

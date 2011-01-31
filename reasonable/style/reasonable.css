@@ -39,13 +39,6 @@ div.ableDebug {
 div.ableDebug p {
   padding: 2px;
 }
-div.ableOptions {
-  background-color: #fff;
-  bottom: 0px;
-  margin-top: -2em;
-  position: absolute;
-  right: 0px;
-}
 div.troll {
   color: #bbb;
 }

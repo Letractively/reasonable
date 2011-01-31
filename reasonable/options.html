@@ -9,6 +9,7 @@
 <form id="options" onsubmit="javascript:return false;">
 <ul>
 <li><input type="checkbox" id="showAltText" onclick="enableSave()"><label for="showAltText">Show alt text (if available) below pictures</label></li>
+<li><input type="checkbox" id="showUnignore" onclick="enableSave()"><label for="showUnignore">Show unignore link for trolls</label></li>
 <li><input type="checkbox" id="showPictures" onclick="enableSave()"><label for="showPictures">Show pictures in comments</label></li>
 <li><input type="checkbox" id="showYouTube" onclick="enableSave()"><label for="showYouTube">Show YouTube in comments</label></li>
 <li><input type="checkbox" id="updatePosts" onclick="enableSave()"><label for="updatePosts">Check for new posts (beta)</label></li>
@@ -25,32 +26,12 @@
 <input type="button" value="Add All" onclick="javascript:addAllTrolls()">
 </li>
 </ul>
-<ul id="trollLists">
-<li>
-<div>
-<label for="blacklist">Blacklist:</label>
-<br>
-<select id="blacklist" multiple></select>
-</div>
-</li>
-<li><button>←</button></li>
-<li>
-<div>
-<label for="reclist">Recommended:</label>
-<br>
-<select id="reclist" multiple></select>
-</div>
-</li>
-<li><button>→</button></li>
-<li>
-<div>
-<label for="whitelist">Whitelist:</label>
-<br>
-<select id="whitelist" multiple></select>
-</div>
-</li>
-</ul>
-
+<table>
+<thead>
+<tr><th>Name/Email/Site</th><th colspan="3">Action</th></tr>
+</thead>
+<tbody id="trolls"></tbody>
+</table>
 <input type="button" id="saveButton" value="Save" onclick="javascript:save()" disabled>
 <script type="text/javascript" src="/script/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="/script/options.js"></script>
