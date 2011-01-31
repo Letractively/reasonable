@@ -2,8 +2,33 @@ const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
 var trolls;
 
 // Clear old settings
+// Delete this sometime in early March 2011
 if (localStorage.settings) {
-  localStorage.clear();
+  var temp = JSON.parse(localStorage.settings);
+
+  for (var key in temp) {
+    switch (key) {
+      case "hideAuto";
+      case "showAltText":
+      case "showUnignore":
+      case "updatePosts":
+      case "showPictures":
+      case "showYouTube":
+        localStorage[key] = temp[key];
+        break;
+      case "blockList":
+        var list = temp[key].split(/,\s/);
+        var arr = {};
+        for (var i = 0; i < list.length; i++) {
+          arr[list[i]] = "black";
+        }
+        localStorage.trolls = JSON.stringify(arr);
+        break;
+      default:
+        break;
+    }
+  }
+  delete localStorage.settings;
 }
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
