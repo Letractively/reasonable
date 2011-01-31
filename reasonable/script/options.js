@@ -136,14 +136,26 @@ function save() {
 }
 
 $(document).ready(function() {
-  $.getJSON(trollListUrl, function(data) {
-    trollList = data;
-    load();
-    // updateTrollList();
-    $troll.bind("keydown", function(e) {
-      if (e.which === 13) {
-        addTroll();
-      }
-    });
+  $.ajax({
+    url: trollListUrl,
+    dataType: "json",
+    success: function(data) {
+      trollList = data;
+      load();
+      $troll.bind("keydown", function(e) {
+        if (e.which === 13) {
+          addTroll();
+        }
+      });
+    },
+    error: function() {
+      trollList = {};
+      load();
+      $troll.bind("keydown", function(e) {
+        if (e.which === 13) {
+          addTroll();
+        }
+      });
+    }
   });
 });

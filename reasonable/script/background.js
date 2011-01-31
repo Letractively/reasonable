@@ -8,7 +8,7 @@ if (localStorage.settings) {
 
   for (var key in temp) {
     switch (key) {
-      case "hideAuto";
+      case "hideAuto":
       case "showAltText":
       case "showUnignore":
       case "updatePosts":
@@ -17,10 +17,10 @@ if (localStorage.settings) {
         localStorage[key] = temp[key];
         break;
       case "blockList":
-        var list = temp[key].split(/,\s/);
+        var l = temp[key].split(/,\s/);
         var arr = {};
-        for (var i = 0; i < list.length; i++) {
-          arr[list[i]] = "black";
+        for (var i = 0; i < l.length; i++) {
+          arr[l[i]] = "black";
         }
         localStorage.trolls = JSON.stringify(arr);
         break;
@@ -28,7 +28,7 @@ if (localStorage.settings) {
         break;
     }
   }
-  delete localStorage.settings;
+  localStorage.removeItem("settings");
 }
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
@@ -99,8 +99,15 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 });
 
 function main() {
-  $.getJSON(trollListUrl, function(data) {
-    trolls = data;
+  $.ajax({
+    url: trollListUrl,
+    dataType: "json",
+    success: function(data) {
+      trolls = data;
+    },
+    error: function() {
+      trolls = {};
+    }
   });
 }
 
