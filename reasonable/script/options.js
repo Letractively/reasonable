@@ -1,9 +1,49 @@
 const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
-var $save = $("#saveButton");
+var $save = $("#save");
 var $troll = $("#troll");
+var trollList = {};
 
-function enableSave() {
-  $save.removeAttr("disabled");
+function sortTrolls(trolls) {
+  var black = [];
+  var white = [];
+  var auto = [];
+  var temp = {};
+
+  // Add troll list from online to current list
+  $.each(trollList, function(key, value) {
+    if (!(key in trolls)) {
+      trolls[key] = "auto";
+    }
+  });
+  
+  $.each(trolls, function(key, value) {
+    switch (value) {
+      case "black":
+        black.push(key);
+        break;
+      case "white":
+        white.push(key);
+        break;
+      case "auto":
+        auto.push(key);
+        break;
+      default:
+        break;
+    }
+  });
+  
+  black.sort();
+  white.sort();
+  auto.sort();
+  
+  $.each(black, function(index, value) { temp[value] = "black"; });
+  $.each(auto, function(index, value) { temp[value] = "auto"; });
+  $.each(white, function(index, value) { temp[value] = "white"; });
+
+  // Save sorted array
+  localStorage.trolls = JSON.stringify(temp);
+  
+  return temp;
 }
 
 function modifyTroll(key, list) {
@@ -13,18 +53,18 @@ function modifyTroll(key, list) {
       $this.closest("tr").children("td." + list).addClass("selected").siblings("td.controll").removeClass("selected");
     }
   });
-  enableSave();
 }
 
 function buildTroll(key, value) {
   var $trollConstructor = $("<tr>")
     .append($("<td>").addClass("name").text(key))
     .append($("<td>").addClass("controll black" + (value === "black" ? " selected" : ""))
-      .append($("<a>").click(function() { modifyTroll(key, "black"); }).append($("<span>").text("black"))))
+      .click(function() { modifyTroll(key, "black"); }).text("black"))
     .append($("<td>").addClass("controll white" + (value === "white" ? " selected" : ""))
-      .append($("<a>").click(function() { modifyTroll(key, "white"); }).append($("<span>").text("white"))))
+      .click(function() { modifyTroll(key, "white"); }).text("white"))
     .append($("<td>").addClass("controll auto" + (value === "auto" ? " selected" : ""))
-      .append($("<a>").click(function() { modifyTroll(key, "auto"); }).append($("<span>").text("auto"))));
+      .click(function() { modifyTroll(key, "auto"); }).text("auto"))
+    .append($("<td>").addClass("remove").click(function() { $(this).closest("tr").remove(); }).text("X"));
   return $trollConstructor;
 }
 
@@ -32,10 +72,6 @@ function addTroll() {
   $("#trolls").append(buildTroll($troll.val(), "black"));
   $troll.val(null);
   return false;
-}
-
-function testForEnter() {
-  alert(e);
 }
 
 function load() {
@@ -48,20 +84,14 @@ function load() {
       var $option = $("#" + key);
       switch ($option.attr("id")) {
         case "trolls":
-          var trolls = JSON.parse(value);
+          var trolls = sortTrolls(JSON.parse(value));
           $.each(trolls, function(tkey, tvalue) {
             $option.append(buildTroll(tkey, tvalue));
           });
           break;
-        case "showAltText":
-        case "showUnignore":
-        case "showPictures":
-        case "showYouTube":
-        case "updatePosts":
-          $option.attr("checked", value == "true");
-          break;
         default:
-          $option.val(value);
+          // Assumes the default is a checkbox
+          $option.attr("checked", value == "true");
           break;
       }
     });
@@ -84,6 +114,7 @@ function save() {
     tempTrolls[key] = value;
   });
   temp.trolls = JSON.stringify(tempTrolls);
+  localStorage.clear();
   for (var key in temp) {
     localStorage[key] = temp[key];
   }
@@ -94,11 +125,14 @@ function save() {
 }
 
 $(document).ready(function() {
-  load();
-  // updateTrollList();
-  $troll.bind("keydown", function(e) {
-    if (e.which === 13) {
-      addTroll();
-    }
+  $.getJSON(trollListUrl, function(data) {
+    trollList = data;
+    load();
+    // updateTrollList();
+    $troll.bind("keydown", function(e) {
+      if (e.which === 13) {
+        addTroll();
+      }
+    });
   });
 });

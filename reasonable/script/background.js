@@ -19,27 +19,31 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       }
       break;
     case "addTroll":
-      var temp = JSON.parse(localStorage);
-      if (temp.blockList === "") {
-        temp.blockList = request.name;
-      } else {
-        temp.blockList += ", " + request.name;
+      var temp = JSON.parse(localStorage.trolls);
+      temp[request.name] = "black";
+      if (request.link) {
+        temp[request.link] = "black";
       }
-      if (request.link !== "") {
-        temp.blockList += ", " + request.link;
-      }
-      localStorage = JSON.stringify(temp);
+      localStorage.trolls = JSON.stringify(temp);
       sendResponse({success: true});
       break;
     case "removeTroll":
-      var temp = JSON.parse(localStorage);
-      temp.blockList = temp.blockList.replace(request.name, "");
-      if (request.link !== "") {
-        temp.blockList = temp.blockList.replace(request.link, "");
+      var temp = JSON.parse(localStorage.trolls);
+      if (request.name in temp) {
+        if (request.name in trolls) {
+          temp[request.name] = "white";
+        } else {
+          delete temp[request.name];
+        }
       }
-      // Delete leading and trailing apostrophes
-      temp.blockList = temp.blockList.replace(/^[,\s]*|[,\s]*$/g, "");
-      localStorage = JSON.stringify(temp);
+      if (request.link in temp) {
+        if (request.link in trolls) {
+          temp[request.link] = "white";
+        } else {
+          delete temp[request.link];
+        }
+      }
+      localStorage.trolls = JSON.stringify(temp);
       sendResponse({success: true});
       break;
     case "reset":

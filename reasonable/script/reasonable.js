@@ -1,4 +1,4 @@
-  // Test URLs and get YouTube YIDs
+// Test URLs and get YouTube YIDs
 const pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
 const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
 
@@ -62,6 +62,13 @@ function getSettings(response, defaults) {
       temp[this.name] = this.value;
       reset = true;
     } else if (this.name === "trolls") {
+      var arr = JSON.parse(temp.trolls);
+      temp.trolls = {};
+      for (var key in arr) {
+        if (arr[key] !== "white") {
+          temp.trolls[key] = arr[key];
+        }
+      }
       for (var key in this.value) {
         if (!(key in temp.trolls)) {
           temp.trolls[key] = "auto";
@@ -192,16 +199,10 @@ function viewThread() {
       if ($this.text() === ignore) {
         chrome.extension.sendRequest({type: "addTroll", name: name, link: link}, function(response) {
           if (response.success == true) {
-            var temp = settings.blockList;
-            if (temp === "") {
-              temp = name;
-            } else {
-              temp += ", " + name;
+            settings.trolls[name] = "black";
+            if (link) {
+              settings.trolls[link] = "black";
             }
-            if (link !== "") {
-              temp += ", " + link;
-            }
-            settings.blockList = temp;
             blockTrolls(true);
           } else {
             alert("Adding troll failed! Try doing it manually in the options page for now. :(");
@@ -210,13 +211,12 @@ function viewThread() {
       } else {
         chrome.extension.sendRequest({type: "removeTroll", name: name, link: link}, function(response) {
           if (response.success == true) {
-            var temp = settings.blockList;
-            temp = temp.replace(name);
-            if (link) {
-              temp = temp.replace(link);
+            if (name in settings.trolls) {
+              delete settings.trolls[name];
             }
-            temp = temp.replace(/^[,\s]*|[,\s]$/g, "");
-            settings.blockList = temp;
+            if (link in settings.trolls) {
+              delete settings.trolls[link];
+            }
             blockTrolls(true);
           } else {
             alert("Removing troll failed! Try doing it manually in the options page for now. :(");
@@ -276,13 +276,7 @@ function updatePosts() {
 }
 
 function blockTrolls(smoothTransitions) {
-  // Build object literal containing a list of trolls
-  var temp = settings.blockList.replace(/,\s/g, ",").split(",");
-  var blockList = {};
   var showHeight = 0;
-  for (var i = 0; i < temp.length; i++) {
-    blockList[temp[i]] = "";
-  }
 
   $($("h2.commentheader strong")).each(function() {
     var $this = $(this);
@@ -290,7 +284,7 @@ function blockTrolls(smoothTransitions) {
     var name = $ignore.data("name");
     var link = $ignore.data("link");
 
-    if (name in blockList || (link !== "" && link in blockList)) {
+    if (name in settings.trolls || (link !== "" && link in settings.trolls)) {
       // If poster is a troll, strip A tag, add troll class, and hide comment body
       var $body = $this.html(name).siblings("a.ignore").text(unignore).closest("div").addClass("troll").children("p, blockquote");
       if (!settings.showUnignore) {
@@ -309,7 +303,7 @@ function blockTrolls(smoothTransitions) {
   });
 }
 
-$(document).ready(function() {
+function main() {
   // Content scripts can't access local storage directly,
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
@@ -336,4 +330,6 @@ $(document).ready(function() {
       });
     }
   });
-});
+}
+
+main();
