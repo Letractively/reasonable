@@ -24,6 +24,6 @@
   ],
   "permissions": [
     "tabs",
-    "http://www.brymck.com/data/trolls.txt"
+    "http://www.brymck.com/reasonable/"
   ]
 }

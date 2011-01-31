@@ -6,25 +6,12 @@
 </head>
 <body>
 <h1><img src="/image/icon_48.png" alt="logo">reasonable</h1>
-<form id="options" onsubmit="javascript:return false;">
-<ul>
+<ul id="options">
 <li><input type="checkbox" id="showAltText" onclick="enableSave()"><label for="showAltText">Show alt text (if available) below pictures</label></li>
 <li><input type="checkbox" id="showUnignore" onclick="enableSave()"><label for="showUnignore">Show unignore link for trolls</label></li>
 <li><input type="checkbox" id="showPictures" onclick="enableSave()"><label for="showPictures">Show pictures in comments</label></li>
 <li><input type="checkbox" id="showYouTube" onclick="enableSave()"><label for="showYouTube">Show YouTube in comments</label></li>
 <li><input type="checkbox" id="updatePosts" onclick="enableSave()"><label for="updatePosts">Check for new posts (beta)</label></li>
-<li>
-<label for="blockList">Block list (comma-separated):</label><br>
-<textarea id="blockList" rows="5" cols="80" spellcheck="false" onkeydown="enableSave()"></textarea>
-</li>
-</ul>
-</form>
-<ul>
-<li class="hidden">
-<label for="recommendList">Recommended for blacklist:</label><br>
-<textarea id="recommendList" rows="5" cols="80" spellcheck="false"></textarea><br>
-<input type="button" value="Add All" onclick="javascript:addAllTrolls()">
-</li>
 </ul>
 <table>
 <thead>
@@ -32,6 +19,8 @@
 </thead>
 <tbody id="trolls"></tbody>
 </table>
+<input type="text" id="troll" placeholder="Troll">
+<input type="button" onclick="javascript:addTroll()" value="Add"><br>
 <input type="button" id="saveButton" value="Save" onclick="javascript:save()" disabled>
 <script type="text/javascript" src="/script/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="/script/options.js"></script>

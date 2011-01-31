@@ -14,13 +14,18 @@ li {
   list-style-type: none;
   padding-bottom: 0.5em;
 }
-.hidden {
-  display: none;
+.controll {
+  color: #ccc;
 }
-select[multiple] {
-  width: 20em;
+.controll.selected {
+  color: #000;
 }
-ul#trollLists * {
-  display: inline;
-  list-style-type: none;
+.controll {
+  text-transform: uppercase;
+}
+.controll a {
+  cursor: pointer;
+}
+.control a:hover {
+  
 }

@@ -1,5 +1,10 @@
-const trollListUrl = "http://www.brymck.com/data/trolls.txt";
-var recommendedList;
+const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
+var trolls;
+
+// Clear old settings
+if (localStorage.settings) {
+  localStorage.clear();
+}
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   switch (request.type) {
@@ -7,10 +12,10 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       if (localStorage) {
         sendResponse({
           settings: localStorage,
-          recommendedList: recommendedList
+          trolls: trolls
         });
       } else {
-        sendResponse({recommendedList: recommendedList});
+        sendResponse({trolls: trolls});
       }
       break;
     case "addTroll":
@@ -38,8 +43,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       sendResponse({success: true});
       break;
     case "reset":
-      localStorage = request.settings;
-      sendResponse({});
+      $.each(request.settings, function(key, value) {
+        localStorage[key] = (key === "trolls" ? JSON.stringify(value) : value);
+      });
       break;
     default:
       sendResponse({}); // snub
@@ -55,8 +61,8 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 });
 
 function main() {
-  $.get(trollListUrl, function(data) {
-    recommendedList = data.split("\n");
+  $.getJSON(trollListUrl, function(data) {
+    trolls = data;
   });
 }
 

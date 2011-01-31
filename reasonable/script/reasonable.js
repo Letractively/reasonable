@@ -51,7 +51,7 @@ function getSettings(response, defaults) {
 
   // Use saved settings if they exist
   try {
-    temp = JSON.parse(response.settings);
+    temp = response.settings;
   } catch(e) {
     temp = {};
   }
@@ -61,13 +61,19 @@ function getSettings(response, defaults) {
     if (temp[this.name] == undefined) {
       temp[this.name] = this.value;
       reset = true;
+    } else if (this.name === "trolls") {
+      for (var key in this.value) {
+        if (!(key in temp.trolls)) {
+          temp.trolls[key] = "auto";
+        }
+      }
     }
   });
-
+  
   // Set and save settings
   settings = temp;
   if (reset) {
-    chrome.extension.sendRequest({type: "reset", settings: JSON.stringify(temp)});
+    chrome.extension.sendRequest({type: "reset", settings: temp});
   }
 }
 
@@ -307,15 +313,13 @@ $(document).ready(function() {
   // Content scripts can't access local storage directly,
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
-    var recommendedList = response.recommendedList;
     getSettings(response, [
       {name: "showAltText", value: true},
       {name: "showUnignore", value: true},
       {name: "updatePosts", value: false},
       {name: "showPictures", value: true},
       {name: "showYouTube", value: true},
-      {name: "trolls", value: {}},
-      {name: "blockList", value: recommendedList.join(", ")}
+      {name: "trolls", value: response.trolls}
     ]);
     altText();
     showMedia();
