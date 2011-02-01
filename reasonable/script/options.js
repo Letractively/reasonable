@@ -1,7 +1,7 @@
 const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
 var actions = {
-  black: { label: "show", value: "black" },
-  white: { label: "hide", value: "white" },
+  black: { label: "hide", value: "black" },
+  white: { label: "show", value: "white" },
   auto:  { label: "auto", value: "auto"  }
 };
 var $save = $("#save");
@@ -33,21 +33,23 @@ function sortTrolls(trolls) {
   });
   
   $.each(trolls, function(key, value) {
-    switch (value) {
-      case actions.black.value:
-        black.push(key);
-        break;
-      case actions.white.value:
-        white.push(key);
-        break;
-      case actions.auto.value:
-        auto.push(key);
-        break;
-      default:
-        break;
+    if (key !== "") { // Prevent blanks from being stored as trolls
+      switch (value) {
+        case actions.black.value:
+          black.push(key);
+          break;
+        case actions.white.value:
+          white.push(key);
+          break;
+        case actions.auto.value:
+          auto.push(key);
+          break;
+        default:
+          break;
+      }
     }
   });
-  
+
   black.sort(sortFunction);
   white.sort(sortFunction);
   auto.sort(sortFunction);
@@ -55,6 +57,7 @@ function sortTrolls(trolls) {
   $.each(black, function(index, value) { temp[value] = actions.black.value; });
   $.each(auto, function(index, value) { temp[value] = actions.auto.value; });
   $.each(white, function(index, value) { temp[value] = actions.white.value; });
+  
 
   // Save sorted array
   localStorage.trolls = JSON.stringify(temp);
