@@ -115,7 +115,7 @@ function save() {
   var tempTrolls = {};
   $("#options input[type=checkbox]").each(function() {
     var $this = $(this);
-    temp[$this.attr("id")] = $this.attr("checked");
+    temp[$this.attr("id")] = Boolean($this.attr("checked"));
   });
   $("#trolls tr").each(function() {
     var $this = $(this);

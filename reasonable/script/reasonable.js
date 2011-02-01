@@ -56,26 +56,44 @@ function getSettings(response, defaults) {
     temp = {};
   }
   
-  // Set to default if undefined
   $.each(defaults, function() {
-    if (temp[this.name] == undefined) {
-      temp[this.name] = this.value;
-      reset = true;
-    } else if (this.name === "trolls") {
-      var arr = JSON.parse(temp.trolls);
-      temp.trolls = {};
-      for (var key in arr) {
-        if (arr[key] === "black" || (temp.hideAuto && arr[key] === "auto")) {
-          temp.trolls[key] = arr[key];
-        }
-      }
-      if (temp.hideAuto) {
-        for (var key in this.value) {
-          if (!(key in temp.trolls)) {
-            temp.trolls[key] = "auto";
+    switch (temp[this.name]) {
+      case undefined:
+        // Set to default if undefined
+        temp[this.name] = this.value;
+        reset = true;
+        break;
+      case "true":
+        // See below for case "false", which is the more important case
+        temp[this.name] = true;
+        break;
+      case "false":
+        // Prevent boolean true from being stored as text
+        // Without this, things like
+        // if (settings.updatePosts) { ... }
+        // will always evaluate as true and execute
+        temp[this.name] = false;
+        break;
+      default:
+        if ((this.name) === "trolls") {
+          var arr = JSON.parse(temp.trolls);
+          temp.trolls = {};
+          
+          // 
+          for (var key in arr) {
+            if (arr[key] === "black" || (temp.hideAuto && arr[key] === "auto")) {
+              temp.trolls[key] = arr[key];
+            }
+          }
+          if (temp.hideAuto) {
+            for (var key in this.value) {
+              if (!(key in temp.trolls)) {
+                temp.trolls[key] = "auto";
+              }
+            }
           }
         }
-      }
+        break;
     }
   });
   
