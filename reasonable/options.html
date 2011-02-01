@@ -5,37 +5,35 @@
 <link rel="stylesheet" type="text/css" href="/style/options.css">
 </head>
 <body>
-<h1><img src="/image/icon_48.png" alt="logo">reason<span class="able">able</span></h1>
+<h1><img src="/image/icon_48.png" alt="logo" title="I put on my monocle and top hat">reason<span class="able">able</span></h1>
 <p>Blacklist trolls you don't want to see again, whitelist folks you do, and leave on auto to let the update scripty do its thing.</p>
 <!--Yes, this is a table-based layout. Chrome was wrapping divs in the popup.-->
 <table id="container">
 <tbody>
 <tr>
 <td id="leftside">
-<table>
+<table id="trolls">
 <thead>
 <tr>
 <th>Name/Email/Site</th>
 <th colspan="4">Action</th>
 </tr>
 </thead>
-<tbody id="trolls"></tbody>
-<tfoot>
-</tfoot>
+<tbody></tbody>
 </table>
 <br>
-<input type="text" id="troll" placeholder="Troll"><button id="add" onclick="javascript:addTroll()">Add</button><br>
+<input type="text" id="troll" placeholder="Troll"><button id="add" onclick="javascript:addTroll()">Blacklist</button><br>
 </td>
 <td id="rightside">
 <ul id="options">
-<li><input type="checkbox" id="hideAuto"><label for="hideAuto">Hide trolls automatically based on <a href="http://www.brymck.com/reasonable/trolls.json" target="_newtab">remote list</a></label></li>
+<li title="This option does not affect trolls you manually blacklist or whitelist, just those with the auto tag"><input type="checkbox" id="hideAuto"><label for="hideAuto">Hide trolls automatically based on <a href="http://www.brymck.com/reasonable/trolls.json" target="_newtab">remote list</a></label></li>
 <li><input type="checkbox" id="showAltText"><label for="showAltText">Show alt text (if available) below pictures</label></li>
-<li><input type="checkbox" id="showUnignore"><label for="showUnignore">Show unignore link for trolls</label></li>
+<li title="Enabling this option will help you avoid the temptation to unhide flamebait"><input type="checkbox" id="showUnignore"><label for="showUnignore">Show unignore link for trolls</label></li>
 <li><input type="checkbox" id="showPictures"><label for="showPictures">Show pictures in comments</label></li>
 <li><input type="checkbox" id="showYouTube"><label for="showYouTube">Show YouTube in comments</label></li>
 <li><input type="checkbox" id="updatePosts"><label for="updatePosts">Check for new posts (beta)</label></li>
 </ul>
-<button id="save" onclick="javascript:save()">Save</button>
+<button id="save" onclick="javascript:save()">Save &amp; Exit</button>
 </td>
 </tr>
 </tbody>

@@ -2,14 +2,8 @@ body, input {
   font-family: verdana;
   font-size: 12px;
 }
-/*
-  Yes, I'm aware that I'm using tables for page layout.
-  It's much cleaner than using divs because Chrome loves wrapping
-  them to the next line when in popup mode
-*/
-td#rightside {
-  min-width: 28em;
-}
+
+/* Logo */
 h1 span.able {
   color: #676799;
 }
@@ -18,7 +12,13 @@ h3 {
   font-weight: normal;
   margin: 0;
 }
-ul {
+td#rightside {
+  /* Yes, I'm aware that I'm using tables for page layout.
+     It's much cleaner than using divs because Chrome loves wrapping
+     them to the next line when in popup mode */
+  min-width: 28em;
+}
+ul#options {
   padding: 0;
 }
 li {
@@ -28,12 +28,11 @@ li {
 table {
   border-collapse: collapse;
 }
-thead {
-  border-bottom: 1px solid #999;
-}
-tfoot {
-  border-bottom: 1px solid #000;
-  border-top: 1px solid #999;
+/* I'd love to make the trolls table scrollable, but this seems to be an
+   issue with WebKit and an optional part of the spec anyway :( */
+#trolls thead {
+  background-color: #676799;
+  color: #fff;
 }
 .remove {
   color: #faa;
@@ -45,7 +44,7 @@ tfoot {
 .remove:hover {
   color: #f00;
 }
-#trolls tr:hover td {
+#trolls tbody tr:hover td {
   background-color: #ffd5c4;
 }
 .controll {
@@ -60,10 +59,10 @@ tfoot {
   background-color: #ddd;
   color: #fff;
 }
-#trolls tr:hover .black.selected, .controll.black.selected {
+#trolls tbody tr:hover .black.selected, .controll.black.selected {
   background-color: #000;
 }
-#trolls tr:hover .black {
+#trolls tbody tr:hover .black {
   background-color: #ddb3a2;
   color: #ffd5c4;
 }
@@ -72,10 +71,10 @@ tfoot {
 .controll.white {
   color: #ccc;
 }
-#trolls tr:hover .white.selected, .controll.white.selected {
+#trolls tbody tr:hover .white.selected, .controll.white.selected {
   color: #000;
 }
-#trolls tr:hover .white {
+#trolls tbody tr:hover .white {
   color: #cca291;
 }
 
@@ -87,11 +86,11 @@ tfoot {
 .controll.auto.selected {
   background-color: #ff6c11;
 }
-#trolls tr:hover .controll.auto {
+#trolls tbody tr:hover .controll.auto {
   background-color: #ffab89;
   color: #fff;
 }
-#trolls tr:hover .controll.auto.selected {
+#trolls tbody tr:hover .controll.auto.selected {
   background-color: #ff4608;
   color: #fff;
 }
@@ -101,7 +100,7 @@ button {
   border: 1px solid #aeafcb;
   border-radius: 4px;
   color: #63659c;
-  padding: 5px 30px;
+  padding: 5px 1em;
   text-shadow: 0 1px #fff;
   -webkit-box-shadow: inset 0 1px 3px #fff, inset 0 -1em #dcdde9, 0 0 3px #aeafcb;
 }

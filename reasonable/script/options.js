@@ -1,4 +1,9 @@
 const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
+var actions = {
+  black: { label: "show", value: "black" },
+  white: { label: "hide", value: "white" },
+  auto:  { label: "auto", value: "auto"  }
+};
 var $save = $("#save");
 var $troll = $("#troll");
 var trollList = {};
@@ -23,19 +28,19 @@ function sortTrolls(trolls) {
   // Add troll list from online to current list
   $.each(trollList, function(key, value) {
     if (!(key in trolls)) {
-      trolls[key] = "auto";
+      trolls[key] = actions.auto.value;
     }
   });
   
   $.each(trolls, function(key, value) {
     switch (value) {
-      case "black":
+      case actions.black.value:
         black.push(key);
         break;
-      case "white":
+      case actions.white.value:
         white.push(key);
         break;
-      case "auto":
+      case actions.auto.value:
         auto.push(key);
         break;
       default:
@@ -47,9 +52,9 @@ function sortTrolls(trolls) {
   white.sort(sortFunction);
   auto.sort(sortFunction);
   
-  $.each(black, function(index, value) { temp[value] = "black"; });
-  $.each(auto, function(index, value) { temp[value] = "auto"; });
-  $.each(white, function(index, value) { temp[value] = "white"; });
+  $.each(black, function(index, value) { temp[value] = actions.black.value; });
+  $.each(auto, function(index, value) { temp[value] = actions.auto.value; });
+  $.each(white, function(index, value) { temp[value] = actions.white.value; });
 
   // Save sorted array
   localStorage.trolls = JSON.stringify(temp);
@@ -66,21 +71,26 @@ function modifyTroll(key, list) {
   });
 }
 
+function buildControll(key, value, comp) {
+  return $("<td>").addClass("controll " + comp.value + (value === comp.value ? " selected" : ""))
+    .attr("title", "Ignore all posts by " + key)
+    .click(function() { modifyTroll(key, comp.value); }).text(comp.label);
+}
+
 function buildTroll(key, value) {
   var $trollConstructor = $("<tr>")
     .append($("<td>").addClass("name").text(key))
-    .append($("<td>").addClass("controll black" + (value === "black" ? " selected" : ""))
-      .click(function() { modifyTroll(key, "black"); }).text("black"))
-    .append($("<td>").addClass("controll white" + (value === "white" ? " selected" : ""))
-      .click(function() { modifyTroll(key, "white"); }).text("white"))
-    .append($("<td>").addClass("controll auto" + (value === "auto" ? " selected" : ""))
-      .click(function() { modifyTroll(key, "auto"); }).text("auto"))
-    .append($("<td>").addClass("remove").click(function() { $(this).closest("tr").remove(); }).text("X"));
+    .append(buildControll(key, value, actions.black))
+    .append(buildControll(key, value, actions.white))
+    .append(buildControll(key, value, actions.auto))
+    .append($("<td>").addClass("remove")
+      .attr("title", "Remove, but note that " + key + " may reappear here if found on the remote list")
+      .click(function() { $(this).closest("tr").remove(); }).text("X"));
   return $trollConstructor;
 }
 
 function addTroll() {
-  $("#trolls").append(buildTroll($troll.val(), "black"));
+  $("#trolls tbody").append(buildTroll($troll.val(), actions.black.value));
   $troll.val(null);
   return false;
 }
@@ -95,7 +105,10 @@ function load() {
       var $option = $("#" + key);
       switch ($option.attr("id")) {
         case "trolls":
+          // Trolls are stored as stringified object
           var trolls = sortTrolls(JSON.parse(value));
+          
+          // Add each troll to the troll list
           $.each(trolls, function(tkey, tvalue) {
             $option.append(buildTroll(tkey, tvalue));
           });
@@ -121,7 +134,26 @@ function save() {
     var $this = $(this);
     var key = $("td.name", $this).text();
     var $selected = $("td.controll.selected", $this);
-    var value = ($selected.size() === 0 ? "auto" : $selected.text());
+    var value;
+    
+    // Set to auto if no value or incorrect label
+    // Otherwise test for blacklist or whitelist
+    if ($selected.size() === 0) {
+      value = actions.auto.value;
+    } else {
+      switch ($selected.text()) {
+        case actions.black.label:
+          value = actions.black.value;
+          break;
+        case actions.white.label:
+          value = actions.white.value;
+          break;
+        default:
+          value = actions.auto.value;
+          break;
+      }
+    }
+
     tempTrolls[key] = value;
   });
   temp.trolls = JSON.stringify(tempTrolls);
