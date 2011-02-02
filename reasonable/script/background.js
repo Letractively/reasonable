@@ -122,7 +122,7 @@ function main() {
     
     var current = new Date();
     if (!localStorage.submitted) {
-      localStorage.submitted = current.getTime();
+      localStorage.submitted = 0;
     }
     
     // Only share troll list every set number of days
