@@ -46,6 +46,9 @@ div.troll {
 div.troll a, div.troll .commentactions button.comment_reply {
   color: #ffab88;
 }
+div.troll img {
+  opacity: 0.27;
+}
 iframe.youtube-player {
   display: block;
 }

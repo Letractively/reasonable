@@ -1,5 +1,5 @@
 const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
-const submitUrl = "http://www.brymck.com/reasonable/submit_trolls"
+const submitUrl = "http://www.brymck.com/reasonable/give"
 const submitDays = 3;
 var trolls;
 
@@ -53,6 +53,16 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         temp[request.link] = "black";
       }
       localStorage.trolls = JSON.stringify(temp);
+      $.ajax({
+        type: "post",
+        url: submitUrl,
+        data: {
+          black: request.name + (request.link ? "," + request.link : ""),
+          white: "",
+          auto: "",
+          hideAuto: localStorage.hideAuto
+        }
+      });
       sendResponse({success: true});
       break;
     case "removeTroll":
@@ -72,6 +82,16 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         }
       }
       localStorage.trolls = JSON.stringify(temp);
+      $.ajax({
+        type: "post",
+        url: submitUrl,
+        data: {
+          black: "",
+          white: request.name + (request.link ? "," + request.link : ""),
+          auto: "",
+          hideAuto: localStorage.hideAuto
+        }
+      });
       sendResponse({success: true});
       break;
     case "reset":
@@ -140,7 +160,7 @@ function main() {
           auto: auto.join(","),
           hideAuto: localStorage.hideAuto
         },
-        dataType: "text",
+        dataType: "json",
         success: function(data) {
           localStorage.submitted = current.getTime();
         },
