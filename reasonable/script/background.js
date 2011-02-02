@@ -121,7 +121,7 @@ function main() {
     }
     
     var current = new Date();
-    if (!localStorage.submitted) {
+    if (localStorage.submitted == undefined) {
       localStorage.submitted = 0;
     }
     
