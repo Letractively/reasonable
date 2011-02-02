@@ -7,6 +7,9 @@ const ignore = "ignore";
 const unignore = "unignore";
 const ignoreClass = "ignore";
 const imgTimeoutLength = 5;
+const gravatarPrefix = "http://www.gravatar.com/avatar/";
+const gravatarSuffix = "?s=40&d=identicon";
+const myMD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
 
 var settings;
 var trolls = [];
@@ -360,9 +363,24 @@ function lightsOut() {
   });
 }
 
+function gravatars() {
+  if (settings.showGravatar) {
+    $(".commentheader > strong > a[href^='mailto:']").each(function() {
+      var email = $(this).attr("href").replace("mailto:", "");
+      var $img = $("<img>").addClass("ableGravatar").attr("src", gravatarPrefix + md5(email) + gravatarSuffix);
+      $(this).closest("div").prepend($img);
+    });
+    $(".commentheader > strong > a:contains(Amakudari)").each(function() {
+      var $img = $("<img>").addClass("ableGravatar").attr("src", gravatarPrefix + myMD5 + gravatarSuffix);
+      $(this).closest("div").prepend($img);
+    });
+  }
+}
+
 function main() {
   // Only run these if there is a comment section displayed
   var commentOnlyRoutines = function() {
+    gravatars();
     viewThread();
     blockTrolls(false);
     setTimeout(function() { updatePosts(); }, 60000);
@@ -373,11 +391,13 @@ function main() {
   chrome.extension.sendRequest({type: "settings"}, function(response) {
     getSettings(response, [
       {name: "hideAuto", value: true},
+      {name: "shareTrolls", value: true},
       {name: "showAltText", value: true},
       {name: "showUnignore", value: true},
       {name: "updatePosts", value: false},
       {name: "showPictures", value: true},
       {name: "showYouTube", value: true},
+      {name: "showGravatar", value: false},
       {name: "trolls", value: response.trolls}
     ]);
     lightsOut();

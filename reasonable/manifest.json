@@ -1,7 +1,7 @@
 {
   "name": "reasonable",
-  "version": "1.1.5",
-  "description": "For a site called reason, you'd think...",
+  "version": "1.2",
+  "description": "For a site called reason, you'd think it would block trolls, help users navigate comment threads, and show inline media. (Drink.)",
   "icons": {
     "16": "/image/icon_16.png",
     "32": "/image/icon_32.png",
@@ -20,6 +20,7 @@
       "matches": ["http://reason.com/*"],
       "css": ["/style/reasonable.css"],
       "js": [
+        "/script/md5.js",
         "/script/jquery-1.4.4.min.js",
         "/script/jquery.brymck.js",
         "/script/reasonable.js"

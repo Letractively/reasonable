@@ -75,3 +75,11 @@ div#ableLightsOutBox img {
   cursor: pointer;
   padding: 5px;
 }
+
+/* Gravatar */
+img.ableGravatar {
+  display: block;
+  float: right;
+  padding-left: 4px;
+  z-index: -1;
+}

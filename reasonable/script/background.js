@@ -1,4 +1,6 @@
 const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
+const submitUrl = "http://www.brymck.com/reasonable/submit_trolls"
+const submitDays = 3;
 var trolls;
 
 // Clear old settings
@@ -14,6 +16,7 @@ if (localStorage.settings) {
       case "updatePosts":
       case "showPictures":
       case "showYouTube":
+      case "showGravatar":
         localStorage[key] = temp[key];
         break;
       case "blockList":
@@ -99,6 +102,46 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 });
 
 function main() {
+  if (localStorage.shareTrolls) {
+    var black = [];
+    var white = [];
+    var temp = JSON.parse(localStorage.trolls);
+    
+    for (var troll in temp) {
+      switch (temp[troll]) {
+        case "black":
+          black.push(troll);
+          break;
+        case "white":
+          white.push(troll);
+          break;
+        default:
+          break;
+      }
+    }
+    
+    var current = new Date();
+    if (!localStorage.submitted) {
+      localStorage.submitted = current.getTime();
+    }
+    
+    // Only share troll list every set number of days
+    if (current.getTime() - localStorage.submitted > submitDays * 86400000) {
+      $.ajax({
+        type: "post",
+        url: submitUrl,
+        data: { black: black.join(","), white: white.join(",") },
+        dataType: "text",
+        success: function(data) {
+          localStorage.submitted = current.getTime();
+        },
+        error: function(data) {
+          // error handler
+        }
+      });
+    }
+  }
+
   $.ajax({
     url: trollListUrl,
     dataType: "json",
