@@ -1,14 +1,16 @@
 // Test URLs and get YouTube YIDs
 const pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
 const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
-
 const collapse = "show direct thread";
 const uncollapse = "show all";
 const ignore = "ignore";
 const unignore = "unignore";
 const ignoreClass = "ignore";
+const imgTimeoutLength = 5;
+
 var settings;
 var trolls = [];
+var lightsOn = false;
 
 function getName($strong) {
   var temp;
@@ -43,6 +45,24 @@ function getLink($strong) {
   temp = temp.replace(/"/g, "");
 
   return temp;
+}
+
+function showImagePopup(img) {
+  var $window = $(window);
+  var $box = $("div#ableLightsOutBox");
+  var $img = $("<img>").load(function() {
+    var $this = $(this);
+    
+    // Have to use setTimeout because height and width from the load event are both 0
+    // Once we've waited a second after loading, though, it should work and be
+    // able to center the image
+    $("div#ableLightsOut").css("height", $(document).height()).fadeTo("fast", 0.5);
+    $box.empty().append($img).fadeTo(5, 0.01, function() {
+      var $this = $(this);
+      $this.center().fadeTo("fast", 1);
+    }).fadeTo("fast", 1);
+    lightsOn = true;
+  }).attr("src", $(img).attr("src"));
 }
 
 function getSettings(response, defaults) {
@@ -147,7 +167,7 @@ function showMedia() {
 function altText() {
   if (settings.showAltText) {
     $("div.post img[alt]").each(function() {
-      var $img = $("<img>").attr("src", this.src);
+      var $img = $("<img>").attr("src", this.src).click(function() { showImagePopup(this); });
       var $div = $("<div>").addClass("ablePic").append($img).append(this.alt);
       $(this).replaceWith($div);
     });
@@ -319,7 +339,35 @@ function blockTrolls(smoothTransitions) {
   });
 }
 
+function lightsOut() {
+  var $overlay = $("<div>").attr("id", "ableLightsOut").css("height", $(document).height());
+  var $box = $("<div>").attr("id", "ableLightsOutBox").keepCentered();
+  
+  // Routine for turning lights on
+  var turnLightsOn = function() {
+    lightsOn = false;
+    $overlay.fadeOut();
+    $box.fadeOut();
+  };
+  
+  $("body").append($box.click(turnLightsOn)).append($overlay);
+  
+  // Turns lights back on if escape key is pressed
+  $(window).keydown(function(e) {
+    if (lightsOn && e.which === 27) {
+      turnLightsOn();
+    }
+  });
+}
+
 function main() {
+  // Only run these if there is a comment section displayed
+  var commentOnlyRoutines = function() {
+    viewThread();
+    blockTrolls(false);
+    setTimeout(function() { updatePosts(); }, 60000);
+  };
+
   // Content scripts can't access local storage directly,
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
@@ -332,19 +380,16 @@ function main() {
       {name: "showYouTube", value: true},
       {name: "trolls", value: response.trolls}
     ]);
+    lightsOut();
     altText();
     showMedia();
 
+    // Run automatically if comments are open, otherwise bind to the click
+    // event for the comment opener link
     if (window.location.href.indexOf("#comment") !== -1) {
-      viewThread();
-      blockTrolls(false);
-      setTimeout(function() { updatePosts(); }, 60000);
+      commentOnlyRoutines();
     } else {
-      $("a[href=#commentcontainer]").click(function() {
-        viewThread();
-        blockTrolls(false);
-        setTimeout(function() { updatePosts(); }, 60000);
-      });
+      $("a[href=#commentcontainer]").click(commentOnlyRoutines);
     }
   });
 }

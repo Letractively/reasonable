@@ -165,7 +165,7 @@ function save() {
     localStorage[key] = temp[key];
   }
   $save.attr("disabled", "disabled");
-  alert("Saved successfully!");
+  alert("Saved successfully!\n\nReload any open reason.com pages to reflect any changes you've made");
   window.close();
   return false;
 }
