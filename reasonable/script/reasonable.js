@@ -1,4 +1,5 @@
 // Test URLs and get YouTube YIDs
+const urlRe = /^https?:\/\/(www\.)?([^\/]+)?/i;
 const pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
 const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
 const collapse = "show direct thread";
@@ -6,7 +7,7 @@ const uncollapse = "show all";
 const ignore = "ignore";
 const unignore = "unignore";
 const ignoreClass = "ignore";
-const imgTimeoutLength = 5;
+const lightsOutOpacity = 0.5;
 const gravatarPrefix = "http://www.gravatar.com/avatar/";
 const gravatarSuffix = "?s=40&d=identicon";
 const myMD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
@@ -38,7 +39,7 @@ function getLink($strong) {
   }
 
   // For blogwhore filtering, get domain name if link is a URL
-  var match = temp.match(/^https?:\/\/(www\.)?([^\/]+)?/i);
+  var match = temp.match(urlRe);
   if (match) {
     temp = JSON.stringify(match[2]);
   } else {
@@ -59,7 +60,7 @@ function showImagePopup(img) {
     // Have to use setTimeout because height and width from the load event are both 0
     // Once we've waited a second after loading, though, it should work and be
     // able to center the image
-    $("div#ableLightsOut").css("height", $(document).height()).fadeTo("fast", 0.5);
+    $("div#ableLightsOut").css("height", $(document).height()).fadeTo("fast", lightsOutOpacity);
     $box.empty().append($img).fadeTo(5, 0.01, function() {
       var $this = $(this);
       $this.center().fadeTo("fast", 1);
@@ -377,6 +378,10 @@ function gravatars() {
   }
 }
 
+function doOtherStuffToo() {
+  $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH");
+}
+
 function main() {
   // Only run these if there is a comment section displayed
   var commentOnlyRoutines = function() {
@@ -403,6 +408,7 @@ function main() {
     lightsOut();
     altText();
     showMedia();
+    doOtherStuffToo();
 
     // Run automatically if comments are open, otherwise bind to the click
     // event for the comment opener link

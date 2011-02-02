@@ -105,6 +105,7 @@ function main() {
   if (localStorage.shareTrolls) {
     var black = [];
     var white = [];
+    var auto = [];
     var temp = JSON.parse(localStorage.trolls);
     
     for (var troll in temp) {
@@ -114,6 +115,9 @@ function main() {
           break;
         case "white":
           white.push(troll);
+          break;
+        case "auto":
+          auto.push(troll);
           break;
         default:
           break;
@@ -130,7 +134,12 @@ function main() {
       $.ajax({
         type: "post",
         url: submitUrl,
-        data: { black: black.join(","), white: white.join(",") },
+        data: {
+          black: black.join(","),
+          white: white.join(","),
+          auto: auto.join(","),
+          hideAuto: localStorage.hideAuto
+        },
         dataType: "text",
         success: function(data) {
           localStorage.submitted = current.getTime();
