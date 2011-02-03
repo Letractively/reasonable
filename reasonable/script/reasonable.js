@@ -62,8 +62,7 @@ function showImagePopup(img) {
     // able to center the image
     $("div#ableLightsOut").css("height", $(document).height()).fadeTo("fast", lightsOutOpacity);
     $box.empty().append($img).fadeTo(5, 0.01, function() {
-      var $this = $(this);
-      $this.center().fadeTo("fast", 1);
+      $(this).center().fadeTo("fast", 1);
     }).fadeTo("fast", 1);
     lightsOn = true;
   }).attr("src", $(img).attr("src"));
@@ -392,6 +391,26 @@ function gravatars() {
   }
 }
 
+function keepHistory() {
+  /*
+  if (settings.keepHistory) {
+    $("input.submit").bind("click", function(e) {
+      var $form = $(this).closest("form");
+        console.log($form.children("input:first").val());
+        console.log($form.children("textarea:first").val());
+      chrome.extension.sendRequest({
+        type: "setSearch",
+        name: $form.children("input:first").val(),
+        content: $form.children("textarea:first").text()
+      }, function(response) {
+        console.log($form.children("input:first").val());
+        console.log($form.children("textarea:first").text());
+      });
+    });
+  }
+  */
+}
+
 function doOtherStuffToo() {
   $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH");
 }
@@ -402,6 +421,7 @@ function main() {
     gravatars();
     viewThread();
     blockTrolls(false);
+    keepHistory();
     setTimeout(function() { updatePosts(); }, 60000);
   };
 
@@ -413,10 +433,11 @@ function main() {
       {name: "shareTrolls", value: true},
       {name: "showAltText", value: true},
       {name: "showUnignore", value: true},
-      {name: "updatePosts", value: false},
       {name: "showPictures", value: true},
       {name: "showYouTube", value: true},
+      {name: "keepHistory", value: true},
       {name: "showGravatar", value: false},
+      {name: "updatePosts", value: false},
       {name: "trolls", value: response.trolls}
     ]);
     lightsOut();

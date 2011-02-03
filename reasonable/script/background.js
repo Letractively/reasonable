@@ -13,10 +13,11 @@ if (localStorage.settings) {
       case "hideAuto":
       case "showAltText":
       case "showUnignore":
-      case "updatePosts":
       case "showPictures":
       case "showYouTube":
+      case "keepHistory":
       case "showGravatar":
+      case "updatePosts":
         localStorage[key] = temp[key];
         break;
       case "blockList":
@@ -93,6 +94,13 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         }
       });
       sendResponse({success: true});
+      break;
+    case "setSearch":
+      localStorage.name = request.name;
+      localStorage.content = request.content;
+      sendResponse({success: true});
+      break;
+    case "keepHistory":
       break;
     case "reset":
       $.each(request.settings, function(key, value) {

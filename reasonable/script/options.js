@@ -65,15 +65,6 @@ function sortTrolls(trolls) {
   return temp;
 }
 
-function modifyTroll(key, list) {
-  $("td.name").each(function() {
-    var $this = $(this);
-    if ($this.text() === key) {
-      $this.closest("tr").children("td." + list).addClass("selected").siblings("td.controll").removeClass("selected");
-    }
-  });
-}
-
 function buildControll($td, key, value, comp) {
   return $td.append($("<input>").attr({
       id: key + "_" + comp.value,
@@ -82,11 +73,6 @@ function buildControll($td, key, value, comp) {
       name: key,
       value: comp.value
     })).append($("<label>").attr("for", key + "_" + comp.value).addClass("actions").text(comp.label));
-  /*
-  return $("<td>").addClass("controll " + comp.value + (value === comp.value ? " selected" : ""))
-    .attr("title", "Ignore all posts by " + key)
-    .click(function() { modifyTroll(key, comp.value); }).text(comp.label);
-  */
 }
 
 function buildTroll(key, value) {
@@ -95,15 +81,6 @@ function buildTroll(key, value) {
   $td = buildControll($td, key, value, actions.black);
   $td = buildControll($td, key, value, actions.white);
   $td = buildControll($td, key, value, actions.auto);
-  
-    /*
-    .append(buildControll(key, value, actions.black))
-    .append(buildControll(key, value, actions.white))
-    .append(buildControll(key, value, actions.auto))
-    .append($("<td>").addClass("remove")
-      .attr("title", "Remove, but note that " + key + " may reappear here if found on the remote list")
-      .click(function() { $(this).closest("tr").remove(); }).text("X"));
-    */
   return $trollConstructor.append($td);
 }
 
@@ -139,6 +116,8 @@ function load() {
     });
   } catch(e) {
   }
+  
+  $(".scrollContent").fitToWindow().keepFitToWindow();
 }
 
 function save() {
@@ -152,7 +131,6 @@ function save() {
     tempTrolls[$(this).attr("name")] = $(this).val();
   });
   temp.trolls = JSON.stringify(tempTrolls);
-  localStorage.clear();
   for (var key in temp) {
     localStorage[key] = temp[key];
   }

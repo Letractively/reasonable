@@ -10,7 +10,16 @@ jQuery.fn.center = function() {
 
 // Keeps centered even if the user scrolls or resizes the window
 jQuery.fn.keepCentered = function() {
-  var $this = this;
-  $(window).scroll(function() { $this.center(); }).resize(function() { $this.center(); });
+  $(window).scroll(function() { this.center(); }).resize(function() { this.center(); });
+  return this;
+};
+
+jQuery.fn.fitToWindow = function() {
+  this.css("height", this.height() + $(document).height() - $("html").outerHeight() + "px");
+  return this;
+};
+
+jQuery.fn.keepFitToWindow = function() {
+  $(window).scroll(function() { this.fitToWindow(); }).resize(function() { this.fitToWindow(); });
   return this;
 };
