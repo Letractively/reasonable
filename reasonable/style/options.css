@@ -7,11 +7,6 @@ body, input {
 h1 span.able {
   color: #676799;
 }
-h3 {
-  font-size: 14px;
-  font-weight: normal;
-  margin: 0;
-}
 td#rightside {
   /* Yes, I'm aware that I'm using tables for page layout.
      It's much cleaner than using divs because Chrome loves wrapping
@@ -34,6 +29,7 @@ table {
   background-color: #676799;
   color: #fff;
 }
+/*
 .remove {
   color: #faa;
   cursor: pointer;
@@ -53,8 +49,10 @@ table {
   padding: 0 2px;
   text-transform: uppercase;
 }
+*/
 
 /* Blacklist */
+/*
 .controll.black {
   background-color: #ddd;
   color: #fff;
@@ -66,8 +64,10 @@ table {
   background-color: #ddb3a2;
   color: #ffd5c4;
 }
+*/
 
 /* Whitelist */
+/*
 .controll.white {
   color: #ccc;
 }
@@ -77,8 +77,10 @@ table {
 #trolls tbody tr:hover .white {
   color: #cca291;
 }
+*/
 
 /* Autolist */
+/*
 .controll.auto {
   background-color: #ffd5c4;
   color: #fff;
@@ -94,6 +96,7 @@ table {
   background-color: #ff4608;
   color: #fff;
 }
+*/
 
 button {
   background-color: #e8e8f0;
@@ -117,6 +120,7 @@ button:active {
   font-size: 1.5em;
   margin-left: 3em;
 }
+
 #troll {
   line-height: 16px;
   margin-right: 0;
@@ -127,4 +131,41 @@ button:active {
   border-left: none;
   line-height: 10px;
   margin-left: 0;
+}
+
+tbody.scrollContent {
+	display: block;
+	height: 262px;
+  overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+input[type=radio] {
+  display: none;
+}
+td label:nth-child(2) {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+td label:nth-child(4) {
+  border-left: 0;
+  border-right: 0;
+}
+td label:nth-child(6) {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+input[type=radio] + label {
+  padding-left: 4px;
+  padding-right: 4px;
+  -webkit-box-shadow: inset 0 1px 3px #dcdde9, inset 0 -0.5em #cbcbdd, 0 0 3px #8586b1;
+}
+input[type=radio]:checked + label {
+  -webkit-box-shadow: inset 0 1px 3px #cbcbdd, inset 0 -0.5em #a8a9c7, 0 0 3px #34367e;
+}
+input[type=radio]:not(:checked) + label:hover {
+  -webkit-box-shadow: inset 0 1px 3px #dce9dd, inset 0 -0.5em #cbddcb, 0 0 3px #85b186;
+}
+label {
+  cursor: pointer;
 }

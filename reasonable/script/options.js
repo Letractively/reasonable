@@ -1,4 +1,4 @@
-const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
+const getUrl = "http://www.brymck.com/reasonable/get";
 var actions = {
   black: { label: "hide", value: "black" },
   white: { label: "show", value: "white" },
@@ -74,22 +74,37 @@ function modifyTroll(key, list) {
   });
 }
 
-function buildControll(key, value, comp) {
+function buildControll($td, key, value, comp) {
+  return $td.append($("<input>").attr({
+      id: key + "_" + comp.value,
+      type: "radio",
+      checked: (value === comp.value),
+      name: key,
+      value: comp.value
+    })).append($("<label>").attr("for", key + "_" + comp.value).addClass("actions").text(comp.label));
+  /*
   return $("<td>").addClass("controll " + comp.value + (value === comp.value ? " selected" : ""))
     .attr("title", "Ignore all posts by " + key)
     .click(function() { modifyTroll(key, comp.value); }).text(comp.label);
+  */
 }
 
 function buildTroll(key, value) {
-  var $trollConstructor = $("<tr>")
-    .append($("<td>").addClass("name").text(key))
+  var $trollConstructor = $("<tr>").append($("<td>").addClass("name").text(key));
+  var $td = $("<td>");
+  $td = buildControll($td, key, value, actions.black);
+  $td = buildControll($td, key, value, actions.white);
+  $td = buildControll($td, key, value, actions.auto);
+  
+    /*
     .append(buildControll(key, value, actions.black))
     .append(buildControll(key, value, actions.white))
     .append(buildControll(key, value, actions.auto))
     .append($("<td>").addClass("remove")
       .attr("title", "Remove, but note that " + key + " may reappear here if found on the remote list")
       .click(function() { $(this).closest("tr").remove(); }).text("X"));
-  return $trollConstructor;
+    */
+  return $trollConstructor.append($td);
 }
 
 function addTroll() {
@@ -133,31 +148,8 @@ function save() {
     var $this = $(this);
     temp[$this.attr("id")] = Boolean($this.attr("checked"));
   });
-  $("#trolls tr").each(function() {
-    var $this = $(this);
-    var key = $("td.name", $this).text();
-    var $selected = $("td.controll.selected", $this);
-    var value;
-    
-    // Set to auto if no value or incorrect label
-    // Otherwise test for blacklist or whitelist
-    if ($selected.size() === 0) {
-      value = actions.auto.value;
-    } else {
-      switch ($selected.text()) {
-        case actions.black.label:
-          value = actions.black.value;
-          break;
-        case actions.white.label:
-          value = actions.white.value;
-          break;
-        default:
-          value = actions.auto.value;
-          break;
-      }
-    }
-
-    tempTrolls[key] = value;
+  $("input:radio:checked").each(function() {
+    tempTrolls[$(this).attr("name")] = $(this).val();
   });
   temp.trolls = JSON.stringify(tempTrolls);
   localStorage.clear();
@@ -172,7 +164,7 @@ function save() {
 
 $(document).ready(function() {
   $.ajax({
-    url: trollListUrl,
+    url: getUrl,
     dataType: "json",
     success: function(data) {
       trollList = data;

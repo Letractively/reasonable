@@ -5,7 +5,7 @@
 <link rel="stylesheet" type="text/css" href="/style/options.css">
 </head>
 <body>
-<h1><img src="/image/icon_48.png" alt="logo" title="I put on my monocle and top hat">reason<span class="able">able</span></h1>
+<h1><img src="/image/icon_48.png" alt="logo" title="I put on my monocle and top hat" height="48" width="48">reason<span class="able">able</span></h1>
 <p>Hide trolls you don't want to see again, show the nice folks who have been improperly maligned, and leave on auto to let the update script do its thing.</p>
 <!--Yes, this is a table-based layout. Chrome was wrapping divs in the popup.-->
 <table id="container">
@@ -15,11 +15,10 @@
 <table id="trolls">
 <thead>
 <tr>
-<th>Name/Email/Site</th>
-<th colspan="4">Action</th>
+<th>Trolls</th>
 </tr>
 </thead>
-<tbody></tbody>
+<tbody class="scrollContent"></tbody>
 </table>
 <br>
 <input type="text" id="troll" placeholder="Troll"><button id="add" onclick="javascript:addTroll()">Blacklist</button><br>
@@ -32,7 +31,7 @@
 <li title="Disabling this option will help you avoid the temptation to unhide flamebait"><input type="checkbox" id="showUnignore" checked><label for="showUnignore">Show unignore link for trolls</label></li>
 <li><input type="checkbox" id="showPictures" checked><label for="showPictures">Show pictures in comments</label></li>
 <li><input type="checkbox" id="showYouTube" checked><label for="showYouTube">Show YouTube in comments</label></li>
-<li><input type="checkbox" id="showGravatar"><label for="showGravatar">Show Gravatar next to poster's name</label></li>
+<li><input type="checkbox" id="showGravatar"><label for="showGravatar">Show <a href="http://en.gravatar.com/">Gravatar</a>/Identicon next to poster's name</label></li>
 <li><input type="checkbox" id="updatePosts"><label for="updatePosts">Check for new posts (beta)</label></li>
 </ul>
 <button id="save" onclick="javascript:save()">Save &amp; Exit</button>

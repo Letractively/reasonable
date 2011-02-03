@@ -326,7 +326,7 @@ function blockTrolls(smoothTransitions) {
 
     if (name in settings.trolls || (link !== "" && link in settings.trolls)) {
       // If poster is a troll, strip A tag, add troll class, and hide comment body
-      var $body = $this.html(name).siblings("a.ignore").text(unignore).closest("div").addClass("troll").children("p, blockquote");
+      var $body = $this.html(name).siblings("a.ignore").text(unignore).closest("div").addClass("troll").children("p, blockquote, img, iframe");
       if (!settings.showUnignore) {
         $this.siblings("a.ignore").hide().prev("span.pipe").hide();
       }
@@ -366,13 +366,27 @@ function lightsOut() {
 
 function gravatars() {
   if (settings.showGravatar) {
-    $(".commentheader > strong > a[href^='mailto:']").each(function() {
-      var email = $(this).attr("href").replace("mailto:", "");
-      var $img = $("<img>").addClass("ableGravatar").attr("src", gravatarPrefix + md5(email) + gravatarSuffix);
-      $(this).closest("div").prepend($img);
-    });
-    $(".commentheader > strong > a:contains(Amakudari)").each(function() {
-      var $img = $("<img>").addClass("ableGravatar").attr("src", gravatarPrefix + myMD5 + gravatarSuffix);
+    $(".commentheader > strong").each(function() {
+      var $this = $(this);
+      var $link = $("a", $this);
+      var hash = "";
+
+      // Create hash based on poster link or name
+      if ($this.text() === "Amakudari") {
+        // Me
+        hash = myMD5;
+      } else if ($link.size() === 0) {
+        // No link
+        hash = md5($this.text());
+      } else if ($link.attr("href").indexOf("mailto:") > -1) {
+        // Email address
+        hash = md5($link.attr("href").replace("mailto:", ""));
+      } else {
+        // URL
+        hash = md5($link.attr("href"));
+      }
+      
+      var $img = $("<img>").addClass("ableGravatar").attr("src", gravatarPrefix + hash + gravatarSuffix);
       $(this).closest("div").prepend($img);
     });
   }

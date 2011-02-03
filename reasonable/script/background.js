@@ -1,5 +1,5 @@
-const trollListUrl = "http://www.brymck.com/reasonable/trolls.json";
-const submitUrl = "http://www.brymck.com/reasonable/give"
+const getUrl = "http://www.brymck.com/reasonable/get";
+const giveUrl = "http://www.brymck.com/reasonable/give"
 const submitDays = 3;
 var trolls;
 
@@ -55,7 +55,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       localStorage.trolls = JSON.stringify(temp);
       $.ajax({
         type: "post",
-        url: submitUrl,
+        url: giveUrl,
         data: {
           black: request.name + (request.link ? "," + request.link : ""),
           white: "",
@@ -84,7 +84,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       localStorage.trolls = JSON.stringify(temp);
       $.ajax({
         type: "post",
-        url: submitUrl,
+        url: giveUrl,
         data: {
           black: "",
           white: request.name + (request.link ? "," + request.link : ""),
@@ -153,7 +153,7 @@ function main() {
     if (current.getTime() - localStorage.submitted > submitDays * 86400000) {
       $.ajax({
         type: "post",
-        url: submitUrl,
+        url: giveUrl,
         data: {
           black: black.join(","),
           white: white.join(","),
@@ -172,7 +172,7 @@ function main() {
   }
 
   $.ajax({
-    url: trollListUrl,
+    url: getUrl,
     dataType: "json",
     success: function(data) {
       trolls = data;
