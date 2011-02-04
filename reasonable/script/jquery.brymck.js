@@ -10,16 +10,33 @@ jQuery.fn.center = function() {
 
 // Keeps centered even if the user scrolls or resizes the window
 jQuery.fn.keepCentered = function() {
-  $(window).scroll(function() { this.center(); }).resize(function() { this.center(); });
+  var $this = this;
+  $(window).scroll(function() { $this.center(); }).resize(function() { $this.center(); });
   return this;
 };
 
-jQuery.fn.fitToWindow = function() {
-  this.css("height", this.height() + $(document).height() - $("html").outerHeight() + "px");
+jQuery.fn.topRight = function() {
+  this.css({
+    top: $(window).scrollTop() + "px",
+    right: $(window).scrollLeft() + "px"
+  });
   return this;
 };
 
-jQuery.fn.keepFitToWindow = function() {
-  $(window).scroll(function() { this.fitToWindow(); }).resize(function() { this.fitToWindow(); });
+jQuery.fn.keepInTopRight = function() {
+  var $this = this;
+  $(window).scroll(function() { $this.topRight(); }).resize(function() { $this.topRight(); });
+  return this;
+};
+
+jQuery.fn.fitToWindow = function(maxHeight) {
+  var height = this.height() + $(document).height() - $("html").outerHeight()
+  this.css("height", (height > maxHeight ? maxHeight : height) + "px");
+  return this;
+};
+
+jQuery.fn.keepFitToWindow = function(maxHeight) {
+  var $this = this;
+  $(window).scroll(function() { $(this).fitToWindow(maxHeight); }).resize(function() { $(this).fitToWindow(maxHeight); });
   return this;
 };

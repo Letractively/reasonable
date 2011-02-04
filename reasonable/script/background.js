@@ -1,6 +1,7 @@
 const getUrl = "http://www.brymck.com/reasonable/get";
 const giveUrl = "http://www.brymck.com/reasonable/give"
 const submitDays = 3;
+const maxHistory = 20;
 var trolls;
 
 // Clear old settings
@@ -97,10 +98,39 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       break;
     case "setSearch":
       localStorage.name = request.name;
-      localStorage.content = request.content;
       sendResponse({success: true});
       break;
     case "keepHistory":
+      var temp;
+      var datetime = new Date();
+      var alreadyExists = false;
+      
+      // Load history if it exists, otherwise set up a temp array
+      if (localStorage.history) {
+        temp = JSON.parse(localStorage.history);
+      } else {
+        temp = [];
+      }
+      
+      $.each(temp, function(index, value) {
+        // Ignore if permalink was from a point in the past or
+        // is identical to one that already exists
+        // This prevents old posts from showing up with a current timestamp
+        if (value.permalink >= request.permalink) {
+          alreadyExists = true;
+        }
+      });
+      
+      if (!alreadyExists) {
+        // Limit history length
+        while (temp.length > maxHistory) {
+          temp.shift();
+        }
+        
+        temp.push({timestamp: datetime.getTime(), url: request.url, permalink: request.permalink});
+      }
+      localStorage.history = JSON.stringify(temp);
+      sendResponse({success: true, exists: alreadyExists, timestamp: datetime.getTime()});
       break;
     case "reset":
       $.each(request.settings, function(key, value) {
@@ -168,7 +198,7 @@ function main() {
           auto: auto.join(","),
           hideAuto: localStorage.hideAuto
         },
-        dataType: "json",
+        dataType: "text",
         success: function(data) {
           localStorage.submitted = current.getTime();
         },

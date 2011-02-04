@@ -116,8 +116,12 @@ function load() {
     });
   } catch(e) {
   }
-  
-  $(".scrollContent").fitToWindow().keepFitToWindow();
+
+  if (window.location.hash === "#popup") {
+    $(".scrollContent").fitToWindow(400);
+  } else {
+    $(".scrollContent").fitToWindow().keepFitToWindow();
+  }
 }
 
 function save() {

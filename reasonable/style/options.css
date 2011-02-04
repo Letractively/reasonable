@@ -40,23 +40,41 @@ button, input[type=radio]:checked + label {
 input[type=radio] + label {
   background-color: #e8e8f0;
   border: 1px solid #aeafcb;
-  border-top: none;
   color: #63659c;
+  padding-top: 1px;
 }
 button {
   border-radius: 4px;
   padding: 5px 1em;
+}
+button:hover {
+  -webkit-animation-name: hover;
+}
+input[type=radio]:not(:checked) + label:hover {
+  -webkit-animation-name: lightHover;
 }
 button:hover, input[type=radio]:not(:checked) + label:hover {
   background-color: #ff8;
   border-color: darkorange;
   color: darkorange;
   cursor: pointer;
-  -webkit-animation-name: hover;
-  -webkit-animation-duration: 1s;
+  -webkit-animation-duration: 0.5s;
   -webkit-animation-iteration-count: 1;
   -webkit-box-shadow: 0 0 18px #ff8;
+  z-index: 100; /* Needed to make box shadow overlap */
 }
+input[type=radio]:checked + label:hover {
+  background-color: #ff4;
+  border-color: darkorange;
+  color: darkorange;
+  cursor: pointer;
+  -webkit-animation-name: checkedHover;
+  -webkit-animation-duration: 0.5s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-box-shadow: 0 0 18px #ff8;
+  z-index: 100; /* Needed to make box shadow overlap */
+}
+
 
 /* Button glow animation */
 @-webkit-keyframes hover {
@@ -65,12 +83,48 @@ button:hover, input[type=radio]:not(:checked) + label:hover {
     border: 1px solid #8586b1;
     color: #fff;
     -webkit-box-shadow: 0 0 0 #8586b1;
+    z-index: 100;
   }
   to {
     background-color: #ff8;
     border-color: darkorange;
     color: darkorange;
     -webkit-box-shadow: 0 0 18px #ff8;
+    z-index: 100;
+  }
+}
+
+@-webkit-keyframes lightHover {
+  from {
+    background-color: #e8e8f0;
+    border: 1px solid #aeafcb;
+    color: #63659c;
+    -webkit-box-shadow: 0 0 0 #e8e8f0;
+    z-index: 100;
+  }
+  to {
+    background-color: #ff8;
+    border-color: darkorange;
+    color: darkorange;
+    -webkit-box-shadow: 0 0 18px #ff8;
+    z-index: 100;
+  }
+}
+
+@-webkit-keyframes checkedHover {
+  from {
+    background-color: #ff8;
+    border-color: darkorange;
+    color: darkorange;
+    -webkit-box-shadow: 0 0 18px #ff8;
+    z-index: 100;
+  }
+  to {
+    background-color: #ff4;
+    border-color: darkorange;
+    color: darkorange;
+    -webkit-box-shadow: 0 0 18px #ff8;
+    z-index: 100;
   }
 }
 
@@ -125,4 +179,7 @@ input[type=radio]:checked + label {
 }
 label {
   cursor: pointer;
+}
+#trolls tbody tr:nth-child(odd) td {
+  background-color: #f0f0f4;
 }

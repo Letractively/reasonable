@@ -2,6 +2,9 @@
 const urlRe = /^https?:\/\/(www\.)?([^\/]+)?/i;
 const pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
 const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
+const dateRe = /([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})\w\@\w(1?[0-9])\:([0-9]{1,2})(A?P?M)/;
+const articleRe = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
+const articleShortenRe = /^(?:archive|blog)?\/[0-9]{4}\/[0-9]{2}\/[0-9]{2}\/(.*?)$/;
 const collapse = "show direct thread";
 const uncollapse = "show all";
 const ignore = "ignore";
@@ -11,7 +14,9 @@ const lightsOutOpacity = 0.5;
 const gravatarPrefix = "http://www.gravatar.com/avatar/";
 const gravatarSuffix = "?s=40&d=identicon";
 const myMD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
+const quicklistMaxItems = 20;
 
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var settings;
 var trolls = [];
 var lightsOn = false;
@@ -98,7 +103,7 @@ function getSettings(response, defaults) {
         temp[this.name] = false;
         break;
       default:
-        if ((this.name) === "trolls") {
+        if (this.name === "trolls") {
           var arr = JSON.parse(temp.trolls);
           temp.trolls = {};
           
@@ -115,6 +120,10 @@ function getSettings(response, defaults) {
               }
             }
           }
+        } else if (this.name === "history") {
+          temp.history = JSON.parse(temp.history).sort(function(a, b) {
+            return (a.permalink - b.permalink);
+          });
         }
         break;
     }
@@ -391,24 +400,78 @@ function gravatars() {
   }
 }
 
+function formatDate(milliseconds) {
+  var date = new Date(milliseconds);
+  return months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+}
+
+function buildQuickload() {
+  if (settings.history.length > 0) {
+    // Set up quickload bar
+    var $ul = $("<ul>");
+    var date = "";
+    var count = 0;
+    
+    $.each(settings.history, function(index, value) {
+      if (count++ <= quicklistMaxItems) {
+        var shortenMatches = articleShortenRe.exec(value.url);
+        var temp = formatDate(value.timestamp);
+
+        if (temp !== date) {
+          date = temp;
+          $ul = $ul.prepend($("<li>").append($("<h2>").text(date)).append($("<ul>")));
+        }
+
+        $ul = $("li:first ul", $ul)
+          .prepend($("<li>")
+              .append($("<a>").attr("href", "http://reason.com/" + value.url + "#comment_" + value.permalink)
+                .text(shortenMatches[1] + " (" + value.permalink + ")"))).parent().parent();
+      }
+    });
+    var $quickload = $("<div>").attr("id", "ableQuick")
+      .append($("<h3>").text("Comment History Quickload"))
+      .append($ul)
+      .hover(function() { $ul.slideDown("fast"); }, function() { $ul.slideUp("fast"); })
+      .topRight().keepInTopRight();
+    $("body").append($quickload.append($ul));
+  }
+}
+
 function keepHistory() {
-  /*
   if (settings.keepHistory) {
-    $("input.submit").bind("click", function(e) {
+    var permalink = 0;
+    
+    $("input.submit").click(function() {
       var $form = $(this).closest("form");
-        console.log($form.children("input:first").val());
-        console.log($form.children("textarea:first").val());
       chrome.extension.sendRequest({
         type: "setSearch",
-        name: $form.children("input:first").val(),
-        content: $form.children("textarea:first").text()
-      }, function(response) {
-        console.log($form.children("input:first").val());
-        console.log($form.children("textarea:first").text());
+        name: $(this).closest("form").children("input:first").val()
       });
     });
+    
+    if (settings.name != null) {
+      $("h2.commentheader > strong:contains('" + settings.name + "') ~ a.permalink").each(function() {
+        var temp = parseFloat($(this).attr("href").replace("#comment_", ""));
+        if (temp > permalink) {
+          permalink = temp;
+        }
+      });
+    }
+
+    // Add to history
+    if (permalink !== 0) {
+      var urlMatches = articleRe.exec(window.location.href);
+      chrome.extension.sendRequest({type: "keepHistory", url: urlMatches[1], permalink: permalink}, function(response) {
+        if (!response.exists) {
+          // Add to history if background script returns that this post is new
+          settings.history.unshift({timestamp: response.timestamp, url: urlMatches[1], permalink: permalink});
+        }
+        buildQuickload();
+      });
+    } else {
+      buildQuickload();
+    }
   }
-  */
 }
 
 function doOtherStuffToo() {
@@ -429,6 +492,8 @@ function main() {
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
     getSettings(response, [
+      {name: "name", value: null},
+      {name: "history", value: []},
       {name: "hideAuto", value: true},
       {name: "shareTrolls", value: true},
       {name: "showAltText", value: true},
