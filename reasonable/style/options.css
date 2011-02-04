@@ -37,6 +37,15 @@ button, input[type=radio]:checked + label {
   border: 1px solid #8586b1;
   color: #fff;
 }
+.remove {
+  border-radius: 2px;
+  font-size: 9px;
+  height: 12px;
+  margin: 0 0 0 4px;
+  padding: 0 4px 1px 4px;
+  -webkit-border-horizontal-spacing: 0;
+  -webkit-border-vertical-spacing: 0;
+}
 input[type=radio] + label {
   background-color: #e8e8f0;
   border: 1px solid #aeafcb;

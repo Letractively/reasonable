@@ -81,6 +81,7 @@ function buildTroll(key, value) {
   $td = buildControll($td, key, value, actions.black);
   $td = buildControll($td, key, value, actions.white);
   $td = buildControll($td, key, value, actions.auto);
+  $td = $td.append($("<button>").addClass("remove").text("X").click(function() { $(this).closest("tr").remove(); }));
   return $trollConstructor.append($td);
 }
 
