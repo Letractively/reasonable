@@ -77,7 +77,7 @@ function buildControll($td, key, value, comp) {
 
 function buildTroll(key, value) {
   var $trollConstructor = $("<tr>").append($("<td>").addClass("name").text(key));
-  var $td = $("<td>");
+  var $td = $("<td>").addClass("actions");
   $td = buildControll($td, key, value, actions.black);
   $td = buildControll($td, key, value, actions.white);
   $td = buildControll($td, key, value, actions.auto);

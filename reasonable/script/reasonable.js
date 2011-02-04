@@ -121,10 +121,10 @@ function getSettings(response, defaults) {
             }
           }
         } else if (this.name === "history") {
-          if ($.isArray(temp.history)) {
+          try {
             temp.history = JSON.parse(temp.history).sort(function(a, b) { return (a.permalink - b.permalink); });
-          } else {
-            temp.history = [];
+          } catch(e) {
+            temp = [];
           }
         }
         break;
@@ -451,7 +451,7 @@ function keepHistory() {
       });
     });
     
-    if (settings.name != "null") {
+    if (settings.name != "null" && settings.name != "") {
       $("h2.commentheader > strong:contains('" + settings.name + "') ~ a.permalink").each(function() {
         var temp = parseFloat($(this).attr("href").replace("#comment_", ""));
         if (temp > permalink) {

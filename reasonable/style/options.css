@@ -13,6 +13,10 @@ td#rightside {
      them to the next line when in popup mode */
   min-width: 28em;
 }
+td.actions {
+  min-width: 11.5em;
+  word-wrap: false;
+}
 td#leftside, td#rightside {
   vertical-align: top;
 }
