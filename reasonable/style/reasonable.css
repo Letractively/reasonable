@@ -24,22 +24,13 @@ div.ableHighlight {
 .ableShow, .ignore {
   cursor: pointer;
 }
-div.ableDebug {
-  background-color: #fff;
-  border: 1px solid #ff6c11;
-  font-family: "courier new", monospace;
-  font-size: 10px;
-  height: 20em;
-  margin: 2px;
-  overflow-y: scroll;
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  width: 30em;
+
+/* Highlight myself */
+div.ableMe {
+  background-color: #ffc;
 }
-div.ableDebug p {
-  padding: 2px;
-}
+
+/* Deal with trolls */
 div.troll {
   color: #bbb;
 }

@@ -17,6 +17,7 @@ if (localStorage.settings) {
       case "showPictures":
       case "showYouTube":
       case "keepHistory":
+      case "highlightMe":
       case "showGravatar":
       case "updatePosts":
         localStorage[key] = temp[key];

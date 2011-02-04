@@ -408,41 +408,45 @@ function formatDate(milliseconds) {
 }
 
 function buildQuickload() {
-  if (settings.history.length > 0) {
-    // Set up quickload bar
-    var $ul = $("<ul>");
-    var date = "";
-    var count = 0;
-    
-    $.each(settings.history, function(index, value) {
-      if (count++ <= quicklistMaxItems) {
-        var shortenMatches = articleShortenRe.exec(value.url);
-        var temp = formatDate(value.timestamp);
+  // May load beforehand if comments haven't been opened yet. In that case, make sure
+  // this doesn't run again
+  if ($("#ableQuick").size() === 0) {
+    if (settings.history.length > 0) {
+      // Set up quickload bar
+      var $ul = $("<ul>");
+      var date = "";
+      var count = 0;
+      
+      $.each(settings.history, function(index, value) {
+        if (count++ <= quicklistMaxItems) {
+          var shortenMatches = articleShortenRe.exec(value.url);
+          var temp = formatDate(value.timestamp);
 
-        if (temp !== date) {
-          date = temp;
-          $ul = $ul.prepend($("<li>").append($("<h2>").text(date)).append($("<ul>")));
+          if (temp !== date) {
+            date = temp;
+            $ul = $ul.prepend($("<li>").append($("<h2>").text(date)).append($("<ul>")));
+          }
+
+          $ul = $("li:first ul", $ul)
+            .prepend($("<li>")
+                .append($("<a>").attr("href", "http://reason.com/" + value.url + "#comment_" + value.permalink)
+                  .text(shortenMatches[1] + " (" + value.permalink + ")"))).parent().parent();
         }
-
-        $ul = $("li:first ul", $ul)
-          .prepend($("<li>")
-              .append($("<a>").attr("href", "http://reason.com/" + value.url + "#comment_" + value.permalink)
-                .text(shortenMatches[1] + " (" + value.permalink + ")"))).parent().parent();
-      }
-    });
-    var $quickload = $("<div>").attr("id", "ableQuick")
-      .append($("<h3>").text("Comment History Quickload"))
-      .append($ul)
-      .hover(function() { $ul.slideDown("fast"); }, function() { $ul.slideUp("fast"); })
-      .topRight().keepInTopRight();
-    $("body").append($quickload.append($ul));
+      });
+      var $quickload = $("<div>").attr("id", "ableQuick")
+        .append($("<h3>").text("Comment History Quickload"))
+        .append($ul)
+        .hover(function() { $ul.slideDown("fast"); }, function() { $ul.slideUp("fast"); })
+        .topRight().keepInTopRight();
+      $("body").append($quickload.append($ul));
+    }
   }
 }
 
-function keepHistory() {
-  if (settings.keepHistory) {
+function historyAndHighlight() {
+  if (settings.keepHistory || settings.highlightMe) {
     var permalink = 0;
-    
+ 
     $("input.submit").click(function() {
       var $form = $(this).closest("form");
       chrome.extension.sendRequest({
@@ -450,28 +454,35 @@ function keepHistory() {
         name: $(this).closest("form").children("input:first").val()
       });
     });
-    
+        
     if (settings.name != "null" && settings.name != "") {
-      $("h2.commentheader > strong:contains('" + settings.name + "') ~ a.permalink").each(function() {
-        var temp = parseFloat($(this).attr("href").replace("#comment_", ""));
-        if (temp > permalink) {
-          permalink = temp;
-        }
-      });
+        $("h2.commentheader > strong:contains('" + settings.name + "') ~ a.permalink").each(function() {
+          if (settings.keepHistory) {
+            var temp = parseFloat($(this).attr("href").replace("#comment_", ""));
+            if (temp > permalink) {
+              permalink = temp;
+            }
+          }
+          if (settings.highlightMe) {
+            $(this).closest("div").addClass("ableMe");
+          }
+        });
     }
 
-    // Add to history
-    if (permalink !== 0) {
-      var urlMatches = articleRe.exec(window.location.href);
-      chrome.extension.sendRequest({type: "keepHistory", url: urlMatches[1], permalink: permalink}, function(response) {
-        if (!response.exists) {
-          // Add to history if background script returns that this post is new
-          settings.history.unshift({timestamp: response.timestamp, url: urlMatches[1], permalink: permalink});
-        }
+    if (settings.keepHistory) {
+      // Add to history
+      if (permalink !== 0) {
+        var urlMatches = articleRe.exec(window.location.href);
+        chrome.extension.sendRequest({type: "keepHistory", url: urlMatches[1], permalink: permalink}, function(response) {
+          if (!response.exists) {
+            // Add to history if background script returns that this post is new
+            settings.history.unshift({timestamp: response.timestamp, url: urlMatches[1], permalink: permalink});
+          }
+          buildQuickload();
+        });
+      } else {
         buildQuickload();
-      });
-    } else {
-      buildQuickload();
+      }
     }
   }
 }
@@ -486,7 +497,7 @@ function main() {
     gravatars();
     viewThread();
     blockTrolls(false);
-    keepHistory();
+    historyAndHighlight();
     setTimeout(function() { updatePosts(); }, 60000);
   };
 
@@ -503,6 +514,7 @@ function main() {
       {name: "showPictures", value: true},
       {name: "showYouTube", value: true},
       {name: "keepHistory", value: true},
+      {name: "highlightMe", value: true},
       {name: "showGravatar", value: false},
       {name: "updatePosts", value: false},
       {name: "trolls", value: response.trolls}
@@ -517,6 +529,7 @@ function main() {
     if (window.location.href.indexOf("#comment") !== -1) {
       commentOnlyRoutines();
     } else {
+      buildQuickload();
       $("a[href=#commentcontainer]").click(commentOnlyRoutines);
     }
   });
