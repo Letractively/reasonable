@@ -141,6 +141,8 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
             temp[key] = value[key];
           }
           localStorage.trolls = JSON.stringify(temp);
+        } else if (key === "history") {
+          localStorage.history = JSON.stringify(value);
         } else {
           localStorage[key] = value;
         }
