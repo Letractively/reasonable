@@ -216,7 +216,28 @@ function main() {
     url: getUrl,
     dataType: "json",
     success: function(data) {
-      trolls = data;
+      try {
+        var temp = JSON.parse(localStorage.trolls);
+        
+        // Remove non-trolls
+        $.each(temp, function(key, value) {
+          if (value === "auto" && !(key in trolls)) {
+            delete temp[key];
+          }
+        });
+        
+        // Add new trolls
+        $.each(data, function(key, value) {
+          if (!(key in temp)) {
+            temp[key] = "auto";
+          }
+        });
+        
+        trolls = temp;
+        localStorage.trolls = JSON.stringify(temp);
+      } catch(e) {
+        // Error handling
+      }
     },
     error: function() {
       trolls = {};
