@@ -172,7 +172,7 @@ td label:nth-child(2) {
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
 }
-td input[type=radio] label:nth-child(4) {
+td input[type=radio] + label:nth-child(4) {
   border-left: 0;
   border-right: 0;
 }
