@@ -14,7 +14,7 @@ td#rightside {
   min-width: 28em;
 }
 td.actions {
-  min-width: 11.5em;
+  min-width: 11.8em;
   word-wrap: false;
 }
 td#leftside, td#rightside {
@@ -93,7 +93,7 @@ input[type=radio]:checked + label:hover {
 @-webkit-keyframes hover {
   from {
     background-color: #8586b1;
-    border: 1px solid #8586b1;
+    border-color: #8586b1;
     color: #fff;
     -webkit-box-shadow: 0 0 0 #8586b1;
     z-index: 100;
@@ -110,7 +110,7 @@ input[type=radio]:checked + label:hover {
 @-webkit-keyframes lightHover {
   from {
     background-color: #e8e8f0;
-    border: 1px solid #aeafcb;
+    border-color: #aeafcb;
     color: #63659c;
     -webkit-box-shadow: 0 0 0 #e8e8f0;
     z-index: 100;
@@ -172,7 +172,7 @@ td label:nth-child(2) {
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
 }
-td label:nth-child(4) {
+td input[type=radio] label:nth-child(4) {
   border-left: 0;
   border-right: 0;
 }
