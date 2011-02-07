@@ -129,6 +129,10 @@ img.ableGravatar {
   padding-left: 1px;
 }
 
+#ableQuick > ul > li + li {
+  padding-top: 0.5em;
+}
+
 #ableQuick li > a {
   display: block;
 }

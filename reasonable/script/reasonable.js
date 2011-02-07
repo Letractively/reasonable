@@ -1,6 +1,6 @@
 // Test URLs and get YouTube YIDs
 const urlRe = /^https?:\/\/(www\.)?([^\/]+)?/i;
-const pictureRe = /^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
+const pictureRe = /^https?:\/\/(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
 const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
 const dateRe = /([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})\w\@\w(1?[0-9])\:([0-9]{1,2})(A?P?M)/;
 const articleRe = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
@@ -14,7 +14,8 @@ const lightsOutOpacity = 0.5;
 const gravatarPrefix = "http://www.gravatar.com/avatar/";
 const gravatarSuffix = "?s=40&d=identicon";
 const myMD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
-const quicklistMaxItems = 20;
+const quickloadMaxItems = 20;
+const quickloadSpeed = 100;
 
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var settings;
@@ -418,7 +419,7 @@ function buildQuickload() {
       var count = 0;
       
       $.each(settings.history, function(index, value) {
-        if (count++ <= quicklistMaxItems) {
+        if (count++ <= quickloadMaxItems) {
           var shortenMatches = articleShortenRe.exec(value.url);
           var temp = formatDate(value.timestamp);
 
@@ -436,7 +437,7 @@ function buildQuickload() {
       var $quickload = $("<div>").attr("id", "ableQuick")
         .append($("<h3>").text("Comment History Quickload"))
         .append($ul)
-        .hover(function() { $ul.slideDown("fast"); }, function() { $ul.slideUp("fast"); })
+        .hover(function() { $ul.slideDown(quickloadSpeed); }, function() { $ul.slideUp(quickloadSpeed); })
         .topRight().keepInTopRight();
       $("body").append($quickload.append($ul));
     }

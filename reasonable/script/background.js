@@ -221,7 +221,7 @@ function main() {
         
         // Remove non-trolls
         $.each(temp, function(key, value) {
-          if (value === "auto" && !(key in trolls)) {
+          if (value === "auto" && !(key in data)) {
             delete temp[key];
           }
         });
