@@ -1,6 +1,10 @@
+const re = /(facebook|twitter)/;
+
 function blockScripts(event) {
   if (event.target.nodeName.toUpperCase() === "IFRAME") {
-    event.preventDefault();
+    if (re.test(event.target.src)) {
+      event.preventDefault();
+    }
   }
 }
 
