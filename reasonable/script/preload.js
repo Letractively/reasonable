@@ -6,11 +6,11 @@ function blockScripts(event) {
 
 function main() {
   chrome.extension.sendRequest({"type": "blockIframes"}, function(response) {
-    // Block iframes if set
-    if (response == "true" || response == true) {
+    // Block iframes unless turned off
+    if (response != false && response != "false") {
       document.addEventListener("beforeload", blockScripts, true);
     }
-  }
+  });
 }
 
 main();
