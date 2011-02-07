@@ -4,39 +4,6 @@ const submitDays = 3;
 const maxHistory = 20;
 var trolls;
 
-// Clear old settings
-// Delete this sometime in early March 2011
-if (localStorage.settings) {
-  var temp = JSON.parse(localStorage.settings);
-
-  for (var key in temp) {
-    switch (key) {
-      case "hideAuto":
-      case "showAltText":
-      case "showUnignore":
-      case "showPictures":
-      case "showYouTube":
-      case "keepHistory":
-      case "highlightMe":
-      case "showGravatar":
-      case "updatePosts":
-        localStorage[key] = temp[key];
-        break;
-      case "blockList":
-        var l = temp[key].split(/,\s/);
-        var arr = {};
-        for (var i = 0; i < l.length; i++) {
-          arr[l[i]] = "black";
-        }
-        localStorage.trolls = JSON.stringify(arr);
-        break;
-      default:
-        break;
-    }
-  }
-  localStorage.removeItem("settings");
-}
-
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   switch (request.type) {
     case "settings":
@@ -132,6 +99,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       }
       localStorage.history = JSON.stringify(temp);
       sendResponse({success: true, exists: alreadyExists, timestamp: datetime.getTime()});
+      break;
+    case "blockIframes":
+      sendResponse(localStorage.blockIframes);
       break;
     case "reset":
       $.each(request.settings, function(key, value) {

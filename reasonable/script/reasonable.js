@@ -510,6 +510,7 @@ function main() {
       {name: "history", value: []},
       {name: "hideAuto", value: true},
       {name: "shareTrolls", value: true},
+      {name: "blockIframes", value: true},
       {name: "showAltText", value: true},
       {name: "showUnignore", value: true},
       {name: "showPictures", value: true},
