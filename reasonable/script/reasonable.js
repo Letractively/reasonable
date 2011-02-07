@@ -108,19 +108,13 @@ function getSettings(response, defaults) {
           var arr = JSON.parse(temp.trolls);
           temp.trolls = {};
           
-          // 
+          // Add trolls from blacklist and, optionally, the autolist
           for (var key in arr) {
             if (arr[key] === "black" || (temp.hideAuto && arr[key] === "auto")) {
               temp.trolls[key] = arr[key];
             }
           }
-          if (temp.hideAuto) {
-            for (var key in this.value) {
-              if (!(key in temp.trolls)) {
-                temp.trolls[key] = "auto";
-              }
-            }
-          }
+
         } else if (this.name === "history") {
           try {
             temp.history = JSON.parse(temp.history).sort(function(a, b) { return (a.permalink - b.permalink); });
