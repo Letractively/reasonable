@@ -1,6 +1,10 @@
 // Test URLs and get YouTube YIDs
 const urlRe = /^https?:\/\/(www\.)?([^\/]+)?/i;
-const pictureRe = /^https?:\/\/(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)$/i;
+
+// Picture regex is based on RFC 2396. It doesn't require a prefix and allows ? and # suffixes.
+const pictureRe = /(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
+
+// Pretty strict filter. May want to revise for linking to someone's profile page.
 const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
 const dateRe = /([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})\w\@\w(1?[0-9])\:([0-9]{1,2})(A?P?M)/;
 const articleRe = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
@@ -16,23 +20,26 @@ const gravatarSuffix = "?s=40&d=identicon";
 const myMD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
 const quickloadMaxItems = 20;
 const quickloadSpeed = 100;
-var defaultSettings = [
-  {name: "name", value: null},
-  {name: "history", value: []},
-  {name: "hideAuto", value: true},
-  {name: "shareTrolls", value: true},
-  {name: "blockIframes", value: false},
-  {name: "showAltText", value: true},
-  {name: "showUnignore", value: true},
-  {name: "showPictures", value: true},
-  {name: "showYouTube", value: true},
-  {name: "keepHistory", value: true},
-  {name: "highlightMe", value: true},
-  {name: "showGravatar", value: false},
-  {name: "updatePosts", value: false},
-];
 
-var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+// Can't be set as constants, but should not be modified
+var defaultSettings = {
+  "name": null,
+  "history": [],
+  "hideAuto": true,
+  "shareTrolls": true,
+  "showAltText": true,
+  "showUnignore": true,
+  "showPictures": true,
+  "showYouTube": true,
+  "keepHistory": true,
+  "highlightMe": true,
+  "showGravatar": false,
+  "blockIframes": false,
+  "updatePosts": false
+};
+
+var months = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"];
 var settings;
 var trolls = [];
 var lightsOn = false;
@@ -40,7 +47,9 @@ var lightsOn = false;
 function getName($strong) {
   var temp;
 
+  // Get name from STRONG tag encapsulating poster's name
   if ($strong.children("a").size() > 0) {
+    // Kind of ugly, but necessary to avoid CDATA
     temp = $("a", $strong).text();
   } else {
     temp = $strong.text();
@@ -53,23 +62,25 @@ function getName($strong) {
 }
 
 function getLink($strong) {
-  var temp = "";
-
   if ($strong.children("a").size() > 0) {
-    temp = $("a", $strong).attr("href");
-  }
+    var temp = $("a", $strong).attr("href");
 
-  // For blogwhore filtering, get domain name if link is a URL
-  var match = temp.match(urlRe);
-  if (match) {
-    temp = JSON.stringify(match[2]);
+    // For blogwhore filtering, get domain name if link is a URL
+    var match = temp.match(urlRe);
+    if (match) {
+      temp = JSON.stringify(match[2]);
+    } else {
+      temp = temp.replace("mailto:", "");
+    }
+
+    // Replace quotation marks with blank spaces
+    temp = temp.replace(/"/g, "");
+
+    return temp;
   } else {
-    temp = temp.replace("mailto:", "");
+    // Ignore if no link
+    return "";
   }
-
-  temp = temp.replace(/"/g, "");
-
-  return temp;
 }
 
 function showImagePopup(img) {
@@ -100,37 +111,37 @@ function getSettings(response, defaults) {
     temp = {};
   }
   
-  $.each(defaults, function() {
-    switch (temp[this.name]) {
+  $.each(defaults, function(key, value) {
+    switch (value) {
       case undefined:
         // Set to default if undefined
-        temp[this.name] = this.value;
+        temp[key] = value;
         reset = true;
         break;
       case "true":
-        // See below for case "false", which is the more important case
-        temp[this.name] = true;
+        // See below for case "false", which is affected more
+        temp[key] = true;
         break;
       case "false":
         // Prevent boolean true from being stored as text
         // Without this, things like
         // if (settings.updatePosts) { ... }
         // will always evaluate as true and execute
-        temp[this.name] = false;
+        temp[key] = false;
         break;
       default:
-        if (this.name === "trolls") {
+        if (key === "trolls") {
+          // Troll list is stored as a string, so parse as JSON first
           var arr = JSON.parse(temp.trolls);
           temp.trolls = {};
           
-          // Add trolls from blacklist and, optionally, the autolist
-          for (var key in arr) {
-            if (arr[key] === "black" || (temp.hideAuto && arr[key] === "auto")) {
-              temp.trolls[key] = arr[key];
+          // Add trolls from blacklist and, at user's option, from autolist
+          $.each(temp.trolls, function(trollKey, trollValue) {
+            if (trollValue === "black" || (temp.hideAuto && trollValue === "auto")) {
+              temp.trolls[trollKey] = trollValue;
             }
-          }
-
-        } else if (this.name === "history") {
+          });
+        } else if (key === "history") {
           try {
             temp.history = JSON.parse(temp.history).sort(function(a, b) { return (a.permalink - b.permalink); });
           } catch(e) {
@@ -152,12 +163,16 @@ function showMedia() {
   if (settings.showPictures || settings.showYouTube) {
     $("div.com-block p a").each(function() {
       var $this = $(this);
+      
+      // Picture routine
       if (settings.showPictures) {
         if (pictureRe.test($this.attr("href"))) {
           var $img = $("<img>").addClass("ableCommentPic").attr("src", $this.attr("href"));
           $this.parent().after($img);
         }
       }
+      
+      // YouTube routine
       if (settings.showYouTube) {
         var matches = youtubeRe.exec($this.attr("href"));
         
@@ -190,9 +205,16 @@ function showMedia() {
 
 function altText() {
   if (settings.showAltText) {
+    // Applies to all images with an alt attribute within an article
     $("div.post img[alt]").each(function() {
+      // When clicked, show the image at its fullest visible dimensions
+      // against a darkened background
       var $img = $("<img>").attr("src", this.src).click(function() { showImagePopup(this); });
+
+      // Create a DIV containing the image followed by its alt text
       var $div = $("<div>").addClass("ablePic").append($img).append(this.alt);
+
+      // Replace existing image with the above DIV
       $(this).replaceWith($div);
     });
   }
@@ -364,6 +386,7 @@ function blockTrolls(smoothTransitions) {
 }
 
 function lightsOut() {
+  // When clicking on an image in the article, darken page and center image
   var $overlay = $("<div>").attr("id", "ableLightsOut").css("height", $(document).height());
   var $box = $("<div>").attr("id", "ableLightsOutBox").keepCentered();
   
@@ -385,6 +408,7 @@ function lightsOut() {
 }
 
 function gravatars() {
+  // Add gravatars in the top right corner of each post
   if (settings.showGravatar) {
     $(".commentheader > strong").each(function() {
       var $this = $(this);
@@ -413,6 +437,7 @@ function gravatars() {
 }
 
 function formatDate(milliseconds) {
+  // Format date like November 23, 1984
   var date = new Date(milliseconds);
   return months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 }
@@ -514,7 +539,7 @@ function main() {
   // Content scripts can't access local storage directly,
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
-    defaultSettings.push({name: "trolls", value: response.trolls});
+    defaultSettings.trolls = response.trolls;
     getSettings(response, defaultSettings);
     lightsOut();
     altText();

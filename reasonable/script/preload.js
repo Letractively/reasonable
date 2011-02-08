@@ -4,7 +4,8 @@ function getSource(obj) {
   if (obj.src) {
     return obj.src;
   } else {
-    return $(obj).attr("data-src");
+    console.log($(obj).data("src"));
+    return $(obj).data("src");
   }
 }
 

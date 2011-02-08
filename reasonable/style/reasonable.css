@@ -91,7 +91,7 @@ img.ableGravatar {
   opacity: 0.5;
   right: 0px;
   top: 0px;
-  width: 25em;
+  min-width: 20em;
   z-index: 100;
   -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
 }
@@ -111,7 +111,6 @@ img.ableGravatar {
     opacity: 1;
   }
 }
-
 
 #ableQuick h3 {
   background-color: #ff6c11;
