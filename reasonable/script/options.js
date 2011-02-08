@@ -1,9 +1,3 @@
-const getUrl = "http://www.brymck.com/reasonable/get";
-var actions = {
-  black: { label: "hide", value: "black" },
-  white: { label: "show", value: "white" },
-  auto:  { label: "auto", value: "auto"  }
-};
 var $save = $("#save");
 var $troll = $("#troll");
 var trollList = {};
@@ -147,7 +141,7 @@ function save() {
 
 $(document).ready(function() {
   $.ajax({
-    url: getUrl,
+    url: GET_URL,
     dataType: "json",
     success: function(data) {
       trollList = data;

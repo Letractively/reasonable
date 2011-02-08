@@ -1,7 +1,4 @@
-const getUrl = "http://www.brymck.com/reasonable/get";
-const giveUrl = "http://www.brymck.com/reasonable/give"
-const submitDays = 3;
-const maxHistory = 20;
+const SUBMIT_DAYS = 3;
 var trolls;
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
@@ -18,14 +15,14 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       break;
     case "addTroll":
       var temp = JSON.parse(localStorage.trolls);
-      temp[request.name] = "black";
+      temp[request.name] = actions.black.value;
       if (request.link) {
-        temp[request.link] = "black";
+        temp[request.link] = actions.black.value;
       }
       localStorage.trolls = JSON.stringify(temp);
       $.ajax({
         type: "post",
-        url: giveUrl,
+        url: GIVE_URL,
         data: {
           black: request.name + (request.link ? "," + request.link : ""),
           white: "",
@@ -39,14 +36,14 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       var temp = JSON.parse(localStorage.trolls);
       if (request.name in temp) {
         if (request.name in trolls) {
-          temp[request.name] = "white";
+          temp[request.name] = actions.white.value;
         } else {
           delete temp[request.name];
         }
       }
       if (request.link in temp) {
         if (request.link in trolls) {
-          temp[request.link] = "white";
+          temp[request.link] = actions.white.value;
         } else {
           delete temp[request.link];
         }
@@ -54,7 +51,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       localStorage.trolls = JSON.stringify(temp);
       $.ajax({
         type: "post",
-        url: giveUrl,
+        url: GIVE_URL,
         data: {
           black: "",
           white: request.name + (request.link ? "," + request.link : ""),
@@ -88,10 +85,11 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
           alreadyExists = true;
         }
       });
-      
+
+      // Add to history if comment was not already there
       if (!alreadyExists) {
         // Limit history length
-        while (temp.length > maxHistory) {
+        while (temp.length > QUICKLOAD_MAX_ITEMS) {
           temp.shift();
         }
         
@@ -101,20 +99,8 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       sendResponse({success: true, exists: alreadyExists, timestamp: datetime.getTime()});
       break;
     case "blockIframes":
-      // Send boolean response, and set to false if no value exists
-      switch (localStorage.blockIframes) {
-        case "true":
-        case true:
-          sendResponse(true);
-          break;
-        case "false":
-        case false:
-          sendResponse(false);          
-          break;
-        default:
-          localStorage.blockIframes = false;
-          sendResponse(false);
-      }
+      // Send boolean response
+      sendResponse(localStorage.blockIframes === "true");
       break;
     case "reset":
       $.each(request.settings, function(key, value) {
@@ -145,87 +131,85 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   }
 });
 
-function main() {
-  if (localStorage.shareTrolls) {
-    var black = [];
-    var white = [];
-    var auto = [];
-    var temp = JSON.parse(localStorage.trolls);
-    
-    for (var troll in temp) {
-      switch (temp[troll]) {
-        case "black":
-          black.push(troll);
-          break;
-        case "white":
-          white.push(troll);
-          break;
-        case "auto":
-          auto.push(troll);
-          break;
-        default:
-          break;
-      }
-    }
-    
-    var current = new Date();
-    if (localStorage.submitted == undefined) {
-      localStorage.submitted = 0;
-    }
-    
-    // Only share troll list every set number of days
-    if (current.getTime() - localStorage.submitted > submitDays * 86400000) {
-      $.ajax({
-        type: "post",
-        url: giveUrl,
-        data: {
-          black: black.join(","),
-          white: white.join(","),
-          auto: auto.join(","),
-          hideAuto: localStorage.hideAuto
-        },
-        dataType: "text",
-        success: function(data) {
-          localStorage.submitted = current.getTime();
-        },
-        error: function(data) {
-          // error handler
-        }
-      });
+// Main routine
+if (localStorage.shareTrolls) {
+  var black = [];
+  var white = [];
+  var auto = [];
+  var temp = JSON.parse(localStorage.trolls);
+  
+  for (var troll in temp) {
+    switch (temp[troll]) {
+      case actions.black.value:
+        black.push(troll);
+        break;
+      case actions.white.value:
+        white.push(troll);
+        break;
+      case actions.auto.value:
+        auto.push(troll);
+        break;
+      default:
+        break;
     }
   }
-
-  $.ajax({
-    url: getUrl,
-    dataType: "json",
-    success: function(data) {
-      try {
-        var temp = JSON.parse(localStorage.trolls);
-        
-        // Remove non-trolls
-        $.each(temp, function(key, value) {
-          if (value === "auto" && !(key in data)) {
-            delete temp[key];
-          }
-        });
-        
-        // Add new trolls
-        $.each(data, function(key, value) {
-          if (!(key in temp)) {
-            temp[key] = "auto";
-          }
-        });
-        
-        trolls = temp;
-        localStorage.trolls = JSON.stringify(temp);
-      } catch(e) {
-        // Error handling
+  
+  var current = new Date();
+  if (localStorage.submitted == undefined) {
+    localStorage.submitted = 0;
+  }
+  
+  // Only share troll list every set number of days
+  if (current.getTime() - localStorage.submitted > SUBMIT_DAYS * 86400000) {
+    $.ajax({
+      type: "post",
+      url: GIVE_URL,
+      data: {
+        black: black.join(","),
+        white: white.join(","),
+        auto: auto.join(","),
+        hideAuto: localStorage.hideAuto
+      },
+      dataType: "text",
+      success: function(data) {
+        // Set submission time in local storage
+        localStorage.submitted = current.getTime();
+      },
+      error: function(data) {
+        // error handler
       }
-    },
-    error: function() {
-      trolls = {};
-    }
-  });
+    });
+  }
 }
 
-main();
+$.ajax({
+  url: GET_URL,
+  dataType: "json",
+  success: function(data) {
+    try {
+      var temp = JSON.parse(localStorage.trolls);
+      
+      // Remove non-trolls
+      $.each(temp, function(key, value) {
+        if (value === "auto" && !(key in data)) {
+          delete temp[key];
+        }
+      });
+      
+      // Add new trolls
+      $.each(data, function(key, value) {
+        if (!(key in temp)) {
+          temp[key] = "auto";
+        }
+      });
+      
+      trolls = temp;
+      localStorage.trolls = JSON.stringify(temp);
+    } catch(e) {
+      // error handler
+    }
+  },
+  error: function() {
+    trolls = {};
+  }
+});

@@ -1,25 +1,32 @@
-// Test URLs and get YouTube YIDs
-const urlRe = /^https?:\/\/(www\.)?([^\/]+)?/i;
+// Get domain name from URL
+const URL_REGEX = /^https?:\/\/(www\.)?([^\/]+)?/i;
 
 // Picture regex is based on RFC 2396. It doesn't require a prefix and allows ? and # suffixes.
-const pictureRe = /(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
+const PICTURE_REGEX = /(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
 
 // Pretty strict filter. May want to revise for linking to someone's profile page.
-const youtubeRe = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
-const dateRe = /([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})\w\@\w(1?[0-9])\:([0-9]{1,2})(A?P?M)/;
-const articleRe = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
-const articleShortenRe = /^(?:archive|blog)?\/[0-9]{4}\/[0-9]{2}\/[0-9]{2}\/(.*?)$/;
-const collapse = "show direct thread";
-const uncollapse = "show all";
-const ignore = "ignore";
-const unignore = "unignore";
-const ignoreClass = "ignore";
-const lightsOutOpacity = 0.5;
-const gravatarPrefix = "http://www.gravatar.com/avatar/";
-const gravatarSuffix = "?s=40&d=identicon";
-const myMD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
-const quickloadMaxItems = 20;
-const quickloadSpeed = 100;
+const YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
+
+// Article URL regular expressions
+const ARTICLE_REGEX = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
+const ARTICLE_SHORTEN_REGEX = /^(?:archive|blog)?\/[0-9]{4}\/[0-9]{2}\/[0-9]{2}\/(.*?)$/;
+
+// Post labels
+const COLLAPSE = "show direct thread";
+const UNCOLLAPSE = "show all";
+const IGNORE = "ignore";
+const UNIGNORE = "unignore";
+
+// Avatars
+const AVATAR_PREFIX = "http://www.gravatar.com/avatar/";
+const AVATAR_SUFFIX = "?s=40&d=identicon";
+const MY_MD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
+
+// Others
+const COMMENT_HISTORY = "Comment History";
+const LIGHTS_OUT_OPACITY = 0.5;
+const QUICKLOAD_SPEED = 100;
+const UPDATE_POST_TIMEOUT_LENGTH = 60000;
 
 // Can't be set as constants, but should not be modified
 var defaultSettings = {
@@ -37,9 +44,9 @@ var defaultSettings = {
   "blockIframes": false,
   "updatePosts": false
 };
-
 var months = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
+
 var settings;
 var trolls = [];
 var lightsOn = false;
@@ -66,7 +73,7 @@ function getLink($strong) {
     var temp = $("a", $strong).attr("href");
 
     // For blogwhore filtering, get domain name if link is a URL
-    var match = temp.match(urlRe);
+    var match = temp.match(URL_REGEX);
     if (match) {
       temp = JSON.stringify(match[2]);
     } else {
@@ -92,7 +99,7 @@ function showImagePopup(img) {
     // Have to use setTimeout because height and width from the load event are both 0
     // Once we've waited a second after loading, though, it should work and be
     // able to center the image
-    $("div#ableLightsOut").css("height", $(document).height()).fadeTo("fast", lightsOutOpacity);
+    $("div#ableLightsOut").css("height", $(document).height()).fadeTo("fast", LIGHTS_OUT_OPACITY);
     $box.empty().append($img).fadeTo(5, 0.01, function() {
       $(this).center().fadeTo("fast", 1);
     }).fadeTo("fast", 1);
@@ -112,7 +119,8 @@ function getSettings(response, defaults) {
   }
   
   $.each(defaults, function(key, value) {
-    switch (value) {
+    // Check original value from settings
+    switch (temp[key]) {
       case undefined:
         // Set to default if undefined
         temp[key] = value;
@@ -130,30 +138,39 @@ function getSettings(response, defaults) {
         temp[key] = false;
         break;
       default:
-        if (key === "trolls") {
-          // Troll list is stored as a string, so parse as JSON first
-          var arr = JSON.parse(temp.trolls);
-          temp.trolls = {};
-          
-          // Add trolls from blacklist and, at user's option, from autolist
-          $.each(temp.trolls, function(trollKey, trollValue) {
-            if (trollValue === "black" || (temp.hideAuto && trollValue === "auto")) {
-              temp.trolls[trollKey] = trollValue;
+        // Some operations need to be done on the trolls and history settings
+        switch (key) {
+          case "trolls":
+            // Troll list is stored as a string, so parse as JSON first
+            var arr = JSON.parse(temp.trolls);
+            temp.trolls = {};
+            
+            // Add trolls from blacklist and, at user's option, from autolist
+            $.each(arr, function(trollKey, trollValue) {
+              if (trollValue === actions.black.value || (temp.hideAuto && trollValue === actions.auto.value)) {
+                temp.trolls[trollKey] = trollValue;
+              }
+            });
+            break;
+          case "history":
+            try {
+              // Sort history by date in descending order
+              temp.history = JSON.parse(temp.history).sort(function(a, b) { return (a.permalink - b.permalink); });
+            } catch(e) {
+              temp = [];
             }
-          });
-        } else if (key === "history") {
-          try {
-            temp.history = JSON.parse(temp.history).sort(function(a, b) { return (a.permalink - b.permalink); });
-          } catch(e) {
-            temp = [];
-          }
+            break;
+          default:
+            break;
         }
         break;
     }
   });
-  
-  // Set and save settings
+    
+  // Store settings
   settings = temp;
+
+  // Save if anything had to be reset
   if (reset) {
     chrome.extension.sendRequest({type: "reset", settings: temp});
   }
@@ -166,7 +183,7 @@ function showMedia() {
       
       // Picture routine
       if (settings.showPictures) {
-        if (pictureRe.test($this.attr("href"))) {
+        if (PICTURE_REGEX.test($this.attr("href"))) {
           var $img = $("<img>").addClass("ableCommentPic").attr("src", $this.attr("href"));
           $this.parent().after($img);
         }
@@ -174,8 +191,8 @@ function showMedia() {
       
       // YouTube routine
       if (settings.showYouTube) {
-        var matches = youtubeRe.exec($this.attr("href"));
-        
+        var matches = YOUTUBE_REGEX.exec($this.attr("href"));
+
         if (matches != null) {
           var $youtube = $("<iframe>").addClass("youtube-player").attr({
             title: "YouTube video player",
@@ -194,7 +211,7 @@ function showMedia() {
     $("div.com-block p:not(:has(a)):contains(http)").each(function() {
       var $this = $(this);
       if (settings.showPictures) {
-        if (pictureRe.test($this.text())) {
+        if (PICTURE_REGEX.test($this.text())) {
           var $img = $("<img>").addClass("ableCommentPic").attr("src", $this.text());
           $this.after($img);
         }
@@ -230,11 +247,11 @@ function viewThread() {
     
     // Get last digit for depth, ignoring the added class for trolls
     var depth = parseInt($comment.attr("class").replace(" troll", "").substr(-1));
-    $comment.addClass("ableHighlight").find(".ableShow").text(uncollapse);
+    $comment.addClass("ableHighlight").find(".ableShow").text(UNCOLLAPSE);
     while (depth > 0 && iter <= 100) {
       $comment = $comment.prev();
       if (parseInt($comment.attr("class").replace(" troll", "").substr(-1)) === depth - 1) {
-        $comment.addClass("ableHighlight").find(".ableShow").text(uncollapse);
+        $comment.addClass("ableHighlight").find(".ableShow").text(UNCOLLAPSE);
         depth--;
       } else {
         hideHeight += $comment.height();
@@ -259,7 +276,7 @@ function viewThread() {
       // Have to reference data attribute because .height() will return 0
       showHeight += $this.data("height");
     });
-    $(".ableHighlight").removeClass("ableHighlight").find(".ableShow").text(collapse);
+    $(".ableHighlight").removeClass("ableHighlight").find(".ableShow").text(COLLAPSE);
     $("html, body").animate({scrollTop: $(window).scrollTop() + showHeight + "px"});
   };
 
@@ -267,8 +284,7 @@ function viewThread() {
     var $strong = $("strong:first", this);
     var name = getName($strong);
     var link = getLink($strong);
-    var $pipe1 = $("<span>").addClass("pipe").text("|");
-    var $pipe2 = $("<span>").addClass("pipe").text("|");
+    var $pipe = $("<span>").addClass("pipe").text("|");
     var $show = $("<a>").addClass("ableShow").click(function(e) {
       var $this = $(this);
       if ($this.parent().parent().hasClass("ableHighlight")) {
@@ -276,18 +292,18 @@ function viewThread() {
       } else {
         showDirects.call(this);
       }
-    }).text(collapse);
-    var $ignore = $("<a>").addClass(ignoreClass).data("name", name).data("link", link).click(function(e) {
+    }).text(COLLAPSE);
+    var $ignore = $("<a>").addClass("ignore").data("name", name).data("link", link).click(function(e) {
       var $this = $(this);
       var $strong = $this.siblings("strong:first");
       var name = $(this).data("name");
       var link = $(this).data("link");
-      if ($this.text() === ignore) {
+      if ($this.text() === IGNORE) {
         chrome.extension.sendRequest({type: "addTroll", name: name, link: link}, function(response) {
           if (response.success == true) {
-            settings.trolls[name] = "black";
+            settings.trolls[name] = actions.black.value;
             if (link) {
-              settings.trolls[link] = "black";
+              settings.trolls[link] = actions.black.value;
             }
             blockTrolls(true);
           } else {
@@ -305,8 +321,8 @@ function viewThread() {
           }
         });
       }
-    }).text(ignore);
-    $(this).append($pipe1).append($show).append($pipe2).append($ignore);
+    }).text(IGNORE);
+    $(this).append($pipe).append($show).append($pipe.clone()).append($ignore);
   });
 }
 
@@ -362,13 +378,13 @@ function blockTrolls(smoothTransitions) {
 
   $($("h2.commentheader strong")).each(function() {
     var $this = $(this);
-    var $ignore = $this.siblings("a." + ignoreClass);
+    var $ignore = $this.siblings("a.ignore");
     var name = $ignore.data("name");
     var link = $ignore.data("link");
 
     if (name in settings.trolls || (link !== "" && link in settings.trolls)) {
       // If poster is a troll, strip A tag, add troll class, and hide comment body
-      var $body = $this.html(name).siblings("a.ignore").text(unignore).closest("div").addClass("troll").children("p, blockquote, img, iframe");
+      var $body = $this.html(name).siblings("a.ignore").text(UNIGNORE).closest("div").addClass("troll").children("p, blockquote, img, iframe");
       if (!settings.showUnignore) {
         $this.siblings("a.ignore").hide().prev("span.pipe").hide();
       }
@@ -378,9 +394,9 @@ function blockTrolls(smoothTransitions) {
       } else {
         $body.hide();
       }
-    } else if (smoothTransitions && $ignore.text() === unignore) {
+    } else if (smoothTransitions && $ignore.text() === UNIGNORE) {
       // Unhide unignored trolls
-      $this.siblings("a.ignore").text(ignore).closest("div").removeClass("troll").children("p, blockquote").slideDown();
+      $this.siblings("a.ignore").text(IGNORE).closest("div").removeClass("troll").children("p, blockquote").slideDown();
     }
   });
 }
@@ -418,7 +434,7 @@ function gravatars() {
       // Create hash based on poster link or name
       if ($this.text() === "Amakudari") {
         // Me
-        hash = myMD5;
+        hash = MY_MD5;
       } else if ($link.size() === 0) {
         // No link
         hash = md5($this.text());
@@ -430,7 +446,7 @@ function gravatars() {
         hash = md5($link.attr("href"));
       }
       
-      var $img = $("<img>").addClass("ableGravatar").attr("src", gravatarPrefix + hash + gravatarSuffix);
+      var $img = $("<img>").addClass("ableGravatar").attr("src", AVATAR_PREFIX + hash + AVATAR_SUFFIX);
       $(this).closest("div").prepend($img);
     });
   }
@@ -453,8 +469,8 @@ function buildQuickload() {
       var count = 0;
       
       $.each(settings.history, function(index, value) {
-        if (count++ <= quickloadMaxItems) {
-          var shortenMatches = articleShortenRe.exec(value.url);
+        if (count++ <= QUICKLOAD_MAX_ITEMS) {
+          var shortenMatches = ARTICLE_SHORTEN_REGEX.exec(value.url);
           var temp = formatDate(value.timestamp);
 
           if (temp !== date) {
@@ -469,9 +485,9 @@ function buildQuickload() {
         }
       });
       var $quickload = $("<div>").attr("id", "ableQuick")
-        .append($("<h3>").text("Comment History Quickload"))
+        .append($("<h3>").text(COMMENT_HISTORY))
         .append($ul)
-        .hover(function() { $ul.slideDown(quickloadSpeed); }, function() { $ul.slideUp(quickloadSpeed); })
+        .hover(function() { $ul.slideDown(QUICKLOAD_SPEED); }, function() { $ul.slideUp(QUICKLOAD_SPEED); })
         .topRight().keepInTopRight();
       $("body").append($quickload.append($ul));
     }
@@ -507,7 +523,7 @@ function historyAndHighlight() {
     if (settings.keepHistory) {
       // Add to history
       if (permalink !== 0) {
-        var urlMatches = articleRe.exec(window.location.href);
+        var urlMatches = ARTICLE_REGEX.exec(window.location.href);
         chrome.extension.sendRequest({type: "keepHistory", url: urlMatches[1], permalink: permalink}, function(response) {
           if (!response.exists) {
             // Add to history if background script returns that this post is new
@@ -526,37 +542,34 @@ function doOtherStuffToo() {
   $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH");
 }
 
-function main() {
-  // Only run these if there is a comment section displayed
-  var commentOnlyRoutines = function() {
-    gravatars();
-    viewThread();
-    blockTrolls(false);
-    historyAndHighlight();
-    setTimeout(function() { updatePosts(); }, 60000);
-  };
+// Main routine
+// Only run these if there is a comment section displayed
+var commentOnlyRoutines = function() {
+  gravatars();
+  viewThread();
+  blockTrolls(false);
+  historyAndHighlight();
+  setTimeout(function() { updatePosts(); }, UPDATE_POST_TIMEOUT_LENGTH);
+};
 
-  // Content scripts can't access local storage directly,
-  // so we have to wait for info from the background script before proceeding
-  chrome.extension.sendRequest({type: "settings"}, function(response) {
-    defaultSettings.trolls = response.trolls;
-    getSettings(response, defaultSettings);
-    lightsOut();
-    altText();
-    showMedia();
-    doOtherStuffToo();
+// Content scripts can't access local storage directly,
+// so we have to wait for info from the background script before proceeding
+chrome.extension.sendRequest({type: "settings"}, function(response) {
+  defaultSettings.trolls = response.trolls;
+  getSettings(response, defaultSettings);
+  lightsOut();
+  altText();
+  showMedia();
+  doOtherStuffToo();
 
-    // Run automatically if comments are open, otherwise bind to the click
-    // event for the comment opener link
-    if (window.location.href.indexOf("#comment") !== -1) {
-      commentOnlyRoutines();
-    } else {
-      buildQuickload();
-      
-      // Fire only once
-      $("div#commentcontrol").one("click", commentOnlyRoutines);
-    }
-  });
-}
-
-main();
+  // Run automatically if comments are open, otherwise bind to the click
+  // event for the comment opener link
+  if (window.location.href.indexOf("#comment") !== -1) {
+    commentOnlyRoutines();
+  } else {
+    buildQuickload();
+    
+    // Fire only once
+    $("div#commentcontrol").one("click", commentOnlyRoutines);
+  }
+});

@@ -19,6 +19,7 @@
     {
       "matches": ["http://reason.com/*"],
       "js": [
+        "/script/const.js",
         "/script/jquery-1.4.4.min.js",
         "/script/jquery.brymck.js",
         "/script/preload.js"
