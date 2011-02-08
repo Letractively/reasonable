@@ -542,10 +542,12 @@ function historyAndHighlight() {
 
 function SUMMON_STEVE_SMITH() {
   if (settings.STEVE_SMITH) {
-    // Transform Stephen J. Smith into superhero
+    // WEAKLING STEPHEN J. SMITH BECOME STRONG STEVE SMITH
     var $context = $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH").closest("div.post");
+    
     var $singleArticleEnd = $("div.entry > p:last", $context);
     if ($singleArticleEnd.size() > 0) {
+      // ONLY SINGLE ARTICLE MEANS ONE ADVICE
       chrome.extension.sendRequest({type: "STEVE_SMITH"}, function(response) {
         var $nextBlockquote = $singleArticleEnd.next("blockquote");
         if ($nextBlockquote.size() > 0) {
@@ -555,6 +557,7 @@ function SUMMON_STEVE_SMITH() {
         }
       })
     } else {
+      // STEVE SMITH LIKE MULTIPLE PARTNERS AND SAY MORE THINGS
       $("p:not([class]):last", $context).each(function() {
         var $this = $(this);
         chrome.extension.sendRequest({type: "STEVE_SMITH"}, function(response) {
@@ -563,6 +566,7 @@ function SUMMON_STEVE_SMITH() {
       });
     }
   }
+  // STEVE SMITH VERY GOOD FOREST LAWYER
 }
 
 // Main routine
