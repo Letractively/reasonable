@@ -1,6 +1,8 @@
+const STEVE_SMITH_URL = "http://www.brymck.com/reasonable/get?what=STEVE_SMITH";
 const SUBMIT_DAYS = 3;
 const DAYS_TO_MILLISECONDS = 86400000;
 var trolls;
+var steveSmithQuotes = [];
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   switch (request.type) {
@@ -119,8 +121,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         }
       });
       break;
-    case "steveSmith":
-      sendResponse(randomSteveSmithQuote());
+    case "STEVE_SMITH":
+      // Randomly generate STEVE SMITH quote
+      sendResponse(steveSmithQuotes[Math.floor(Math.random() * steveSmithQuotes.length)]);
       break;
     default:
       sendResponse({}); // snub
@@ -215,5 +218,17 @@ $.ajax({
   },
   error: function() {
     trolls = {};
+  }
+});
+
+// Get updated list of STEVE SMITH quotes
+$.ajax({
+  url: STEVE_SMITH_URL,
+  dataType: "json",
+  success: function(data) {
+    steveSmithQuotes = data;
+  },
+  error: function() {
+    // Error handler
   }
 });
