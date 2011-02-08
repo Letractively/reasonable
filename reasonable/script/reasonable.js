@@ -504,7 +504,7 @@ function main() {
       {name: "history", value: []},
       {name: "hideAuto", value: true},
       {name: "shareTrolls", value: true},
-      {name: "blockIframes", value: true},
+      {name: "blockIframes", value: false},
       {name: "showAltText", value: true},
       {name: "showUnignore", value: true},
       {name: "showPictures", value: true},
@@ -526,7 +526,7 @@ function main() {
       commentOnlyRoutines();
     } else {
       buildQuickload();
-      $("a[href=#commentcontainer]").click(commentOnlyRoutines);
+      $("a[href=#commentcontainer], div#commentcontrol").click(commentOnlyRoutines);
     }
   });
 }
