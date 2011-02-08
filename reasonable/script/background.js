@@ -119,6 +119,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         }
       });
       break;
+    case "steveSmith":
+      sendResponse(randomSteveSmithQuote());
+      break;
     default:
       sendResponse({}); // snub
       break;

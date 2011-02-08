@@ -43,7 +43,8 @@ var defaultSettings = {
   "highlightMe": true,
   "showGravatar": false,
   "blockIframes": false,
-  "updatePosts": false
+  "updatePosts": false,
+  "steveSmith": true
 };
 var months = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
@@ -539,8 +540,14 @@ function historyAndHighlight() {
   }
 }
 
-function doOtherStuffToo() {
-  $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH");
+function summonSteveSmith() {
+  if (settings.steveSmith) {
+    // Transform Stephen J. Smith into superhero
+    chrome.extension.sendRequest({type: "steveSmith"}, function(response) {
+      $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH")
+        .closest("p").append($("<span>").addClass("steve_smith").text(response));
+    });
+  }
 }
 
 // Main routine
@@ -561,7 +568,7 @@ chrome.extension.sendRequest({type: "settings"}, function(response) {
   lightsOut();
   altText();
   showMedia();
-  doOtherStuffToo();
+  summonSteveSmith();
 
   // Run automatically if comments are open, otherwise bind to the click
   // event for the comment opener link

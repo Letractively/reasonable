@@ -135,3 +135,11 @@ img.ableGravatar {
 #ableQuick li > a {
   display: block;
 }
+
+/* STEVE SMITH */
+span.steve_smith {
+  color: #888;
+  display: block;
+  font-size: smaller;
+  line-height: 1em;
+}
