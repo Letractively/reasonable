@@ -44,7 +44,7 @@ var defaultSettings = {
   "showGravatar": false,
   "blockIframes": false,
   "updatePosts": false,
-  "steveSmith": true
+  "STEVE_SMITH": true
 };
 var months = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
@@ -540,24 +540,28 @@ function historyAndHighlight() {
   }
 }
 
-function summonSteveSmith() {
-  if (settings.steveSmith) {
+function SUMMON_STEVE_SMITH() {
+  if (settings.STEVE_SMITH) {
     // Transform Stephen J. Smith into superhero
-    chrome.extension.sendRequest({type: "STEVE_SMITH"}, function(response) {
-      var $context = $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH").closest("div.post");
-      var $quote = $("<p>").text(response);
-      var $singleArticleEnd = $("div.entry > p:last", $context);
-      if ($singleArticleEnd.size() > 0) {
+    var $context = $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH").closest("div.post");
+    var $singleArticleEnd = $("div.entry > p:last", $context);
+    if ($singleArticleEnd.size() > 0) {
+      chrome.extension.sendRequest({type: "STEVE_SMITH"}, function(response) {
         var $nextBlockquote = $singleArticleEnd.next("blockquote");
         if ($nextBlockquote.size() > 0) {
-          $nextBlockquote.after($quote);
+          $nextBlockquote.after($("<p>").text(response));
         } else {
-          $singleArticleEnd.after($quote);
+          $singleArticleEnd.after($("<p>").text(response));
         }
-      } else {
-        $("p:not([class]):last", $context).after($quote);
-      }
-    });
+      })
+    } else {
+      $("p:not([class]):last", $context).each(function() {
+        var $this = $(this);
+        chrome.extension.sendRequest({type: "STEVE_SMITH"}, function(response) {
+          $this.after($("<p>").text(response));
+        })
+      });
+    }
   }
 }
 
@@ -579,7 +583,7 @@ chrome.extension.sendRequest({type: "settings"}, function(response) {
   lightsOut();
   altText();
   showMedia();
-  summonSteveSmith();
+  SUMMON_STEVE_SMITH();
 
   // Run automatically if comments are open, otherwise bind to the click
   // event for the comment opener link
