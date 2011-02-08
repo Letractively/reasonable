@@ -1,4 +1,5 @@
 const SUBMIT_DAYS = 3;
+const DAYS_TO_MILLISECONDS = 86400000;
 var trolls;
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
@@ -160,7 +161,7 @@ if (localStorage.shareTrolls) {
   }
   
   // Only share troll list every set number of days
-  if (current.getTime() - localStorage.submitted > SUBMIT_DAYS * 86400000) {
+  if (current.getTime() - localStorage.submitted > SUBMIT_DAYS * DAYS_TO_MILLISECONDS) {
     $.ajax({
       type: "post",
       url: GIVE_URL,

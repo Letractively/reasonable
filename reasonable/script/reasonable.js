@@ -22,8 +22,9 @@ const AVATAR_PREFIX = "http://www.gravatar.com/avatar/";
 const AVATAR_SUFFIX = "?s=40&d=identicon";
 const MY_MD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
 
-// Others
+// Others and magic number avoidance
 const COMMENT_HISTORY = "Comment History";
+const ESCAPE_KEY = 27;
 const LIGHTS_OUT_OPACITY = 0.5;
 const QUICKLOAD_SPEED = 100;
 const UPDATE_POST_TIMEOUT_LENGTH = 60000;
@@ -369,7 +370,7 @@ function updatePosts() {
       }
     });
 
-    setTimeout(function() { updatePosts(); }, 60000);
+    setTimeout(function() { updatePosts(); }, UPDATE_POST_TIMEOUT_LENGTH);
   }
 }
 
@@ -417,7 +418,7 @@ function lightsOut() {
   
   // Turns lights back on if escape key is pressed
   $(window).keydown(function(e) {
-    if (lightsOn && e.which === 27) {
+    if (lightsOn && e.which === ESCAPE_KEY) {
       turnLightsOn();
     }
   });

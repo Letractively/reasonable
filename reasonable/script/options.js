@@ -1,8 +1,11 @@
+const ENTER_KEY = 13;
+const SAVED_SUCCESS_MESSAGE = "Saved successfully!\n\nReload any open reason.com pages to reflect any changes you've made.";
 var $save = $("#save");
 var $troll = $("#troll");
 var trollList = {};
 
 function sortTrolls(trolls) {
+  // Sort alphabetically
   var sortFunction = function(x, y) {
     var a = String(x).toUpperCase();
     var b = String(y).toUpperCase();
@@ -51,7 +54,6 @@ function sortTrolls(trolls) {
   $.each(black, function(index, value) { temp[value] = actions.black.value; });
   $.each(auto, function(index, value) { temp[value] = actions.auto.value; });
   $.each(white, function(index, value) { temp[value] = actions.white.value; });
-  
 
   // Save sorted array
   localStorage.trolls = JSON.stringify(temp);
@@ -133,8 +135,7 @@ function save() {
   for (var key in temp) {
     localStorage[key] = temp[key];
   }
-  $save.attr("disabled", "disabled");
-  alert("Saved successfully!\n\nReload any open reason.com pages to reflect any changes you've made");
+  alert(SAVED_SUCCESS_MESSAGE);
   window.close();
   return false;
 }
@@ -147,7 +148,7 @@ $(document).ready(function() {
       trollList = data;
       load();
       $troll.bind("keydown", function(e) {
-        if (e.which === 13) {
+        if (e.which === ENTER_KEY) {
           addTroll();
         }
       });
@@ -156,7 +157,7 @@ $(document).ready(function() {
       trollList = {};
       load();
       $troll.bind("keydown", function(e) {
-        if (e.which === 13) {
+        if (e.which === ENTER_KEY) {
           addTroll();
         }
       });
