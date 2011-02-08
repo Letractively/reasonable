@@ -101,7 +101,20 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       sendResponse({success: true, exists: alreadyExists, timestamp: datetime.getTime()});
       break;
     case "blockIframes":
-      sendResponse(localStorage.blockIframes);
+      // Send boolean response, and set to false if no value exists
+      switch (localStorage.blockIframes) {
+        case "true":
+        case true:
+          sendResponse(true);
+          break;
+        case "false":
+        case false:
+          sendResponse(false);          
+          break;
+        default:
+          localStorage.blockIframes = false;
+          sendResponse(false);
+      }
       break;
     case "reset":
       $.each(request.settings, function(key, value) {

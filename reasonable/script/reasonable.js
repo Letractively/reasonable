@@ -16,6 +16,21 @@ const gravatarSuffix = "?s=40&d=identicon";
 const myMD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
 const quickloadMaxItems = 20;
 const quickloadSpeed = 100;
+var defaultSettings = [
+  {name: "name", value: null},
+  {name: "history", value: []},
+  {name: "hideAuto", value: true},
+  {name: "shareTrolls", value: true},
+  {name: "blockIframes", value: false},
+  {name: "showAltText", value: true},
+  {name: "showUnignore", value: true},
+  {name: "showPictures", value: true},
+  {name: "showYouTube", value: true},
+  {name: "keepHistory", value: true},
+  {name: "highlightMe", value: true},
+  {name: "showGravatar", value: false},
+  {name: "updatePosts", value: false},
+];
 
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var settings;
@@ -499,22 +514,8 @@ function main() {
   // Content scripts can't access local storage directly,
   // so we have to wait for info from the background script before proceeding
   chrome.extension.sendRequest({type: "settings"}, function(response) {
-    getSettings(response, [
-      {name: "name", value: null},
-      {name: "history", value: []},
-      {name: "hideAuto", value: true},
-      {name: "shareTrolls", value: true},
-      {name: "blockIframes", value: false},
-      {name: "showAltText", value: true},
-      {name: "showUnignore", value: true},
-      {name: "showPictures", value: true},
-      {name: "showYouTube", value: true},
-      {name: "keepHistory", value: true},
-      {name: "highlightMe", value: true},
-      {name: "showGravatar", value: false},
-      {name: "updatePosts", value: false},
-      {name: "trolls", value: response.trolls}
-    ]);
+    defaultSettings.push({name: "trolls", value: response.trolls});
+    getSettings(response, defaultSettings);
     lightsOut();
     altText();
     showMedia();
@@ -526,7 +527,9 @@ function main() {
       commentOnlyRoutines();
     } else {
       buildQuickload();
-      $("a[href=#commentcontainer], div#commentcontrol").click(commentOnlyRoutines);
+      
+      // Fire only once
+      $("div#commentcontrol").one("click", commentOnlyRoutines);
     }
   });
 }

@@ -40,3 +40,8 @@ jQuery.fn.keepFitToWindow = function(maxHeight) {
   $(window).scroll(function() { $(this).fitToWindow(maxHeight); }).resize(function() { $(this).fitToWindow(maxHeight); });
   return this;
 };
+
+jQuery.fn.beforeload = function(fn) {
+  this[0].addEventListener("beforeload", fn, true);
+  return this;
+}

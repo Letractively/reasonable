@@ -1,20 +1,22 @@
 const re = /(facebook|twitter)/;
 
-function blockScripts(event) {
-  if (event.target.nodeName.toUpperCase() === "IFRAME") {
-    if (re.test(event.target.src)) {
-      event.preventDefault();
-    }
+function getSource(obj) {
+  if (obj.src) {
+    return obj.src;
+  } else {
+    return $(obj).attr("data-src");
   }
 }
 
-function main() {
-  chrome.extension.sendRequest({"type": "blockIframes"}, function(response) {
-    // Block iframes unless turned off
-    if (response != false && response != "false") {
-      document.addEventListener("beforeload", blockScripts, true);
-    }
-  });
-}
-
-main();
+chrome.extension.sendRequest({"type": "blockIframes"}, function(response) {
+  // Block iframes unless turned off
+  if (response) {
+    $(document).beforeload(function(e) {
+      if (e.target.nodeName.toUpperCase() === "IFRAME") {
+        if (re.test(getSource(e.target))) {
+          e.preventDefault();
+        }
+      }        
+    });
+  }
+});
