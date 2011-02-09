@@ -9,7 +9,7 @@ const YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-
 
 // Article URL regular expressions
 const ARTICLE_REGEX = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
-const ARTICLE_SHORTEN_REGEX = /^(?:archive|blog)?\/[0-9]{4}\/[0-9]{2}\/[0-9]{2}\/(.*?)$/;
+const ARTICLE_SHORTEN_REGEX = /^(?:archive|blog)?\/(?:19|20)[0-9]{2}\/(?:0[1-9]|1[0-2])\/(?:0[1-9]|[12][0-9]|3[0-1])\/(.*?)$/;
 
 // Post labels
 const COLLAPSE = "show direct thread";
@@ -22,10 +22,16 @@ const AVATAR_PREFIX = "http://www.gravatar.com/avatar/";
 const AVATAR_SUFFIX = "?s=40&d=identicon";
 const MY_MD5 = "b5ce5f2f748ceefff8b6a5531d865a27";
 
+// Lights out
+const LIGHTS_OUT_OPACITY = 0.5;
+const MINIMAL_OPACITY = 0.01;
+const TOTAL_OPACITY = 1;
+const FADE_SPEED = 500;
+const MINIMAL_FADE_SPEED = 5;
+
 // Others and magic number avoidance
 const COMMENT_HISTORY = "Comment History";
 const ESCAPE_KEY = 27;
-const LIGHTS_OUT_OPACITY = 0.5;
 const QUICKLOAD_SPEED = 100;
 const UPDATE_POST_TIMEOUT_LENGTH = 60000;
 
@@ -101,10 +107,10 @@ function showImagePopup(img) {
     // Have to use setTimeout because height and width from the load event are both 0
     // Once we've waited a second after loading, though, it should work and be
     // able to center the image
-    $("div#ableLightsOut").css("height", $(document).height()).fadeTo("fast", LIGHTS_OUT_OPACITY);
-    $box.empty().append($img).fadeTo(5, 0.01, function() {
-      $(this).center().fadeTo("fast", 1);
-    }).fadeTo("fast", 1);
+    $("div#ableLightsOut").css("height", $(document).height()).fadeTo(FADE_SPEED, LIGHTS_OUT_OPACITY);
+    $box.empty().append($img).fadeTo(MINIMAL_FADE_SPEED, MINIMAL_OPACITY, function() {
+      $(this).center().fadeTo(FADE_SPEED - MINIMAL_FADE_SPEED, TOTAL_OPACITY);
+    }).fadeTo(FADE_SPEED, TOTAL_OPACITY);
     lightsOn = true;
   }).attr("src", $(img).attr("src"));
 }
@@ -435,7 +441,7 @@ function lightsOut() {
     $box.fadeOut();
   };
   
-  $("body").append($box.click(turnLightsOn)).append($overlay);
+  $("body").append($box.click(turnLightsOn)).append($overlay.click(turnLightsOn));
   
   // Turns lights back on if escape key is pressed
   $(window).keydown(function(e) {

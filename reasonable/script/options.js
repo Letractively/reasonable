@@ -164,3 +164,5 @@ $(document).ready(function() {
     }
   });
 });
+
+$("li:has(input#STEVE_SMITH)").attr("title", chrome.extension.getBackgroundPage().RANDOM_STEVE_SMITH_QUOTE());
