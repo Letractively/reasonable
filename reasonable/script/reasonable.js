@@ -9,7 +9,7 @@ const YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-
 
 // Article URL regular expressions
 const ARTICLE_REGEX = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
-const ARTICLE_SHORTEN_REGEX = /^(?:archive|blog)?\/(?:19|20)[0-9]{2}\/(?:0[1-9]|1[0-2])\/(?:0[1-9]|[12][0-9]|3[0-1])\/(.*?)$/;
+const ARTICLE_SHORTEN_REGEX = /^(?:archives|blog)?\/(?:19|20)[0-9]{2}\/(?:0[1-9]|1[0-2])\/(?:0[1-9]|[12][0-9]|3[0-1])\/(.*?)(?:\#|$)/;
 
 // Post labels
 const COLLAPSE = "show direct thread";
@@ -32,6 +32,7 @@ const MINIMAL_FADE_SPEED = 5;
 // Others and magic number avoidance
 const COMMENT_HISTORY = "Comment History";
 const ESCAPE_KEY = 27;
+const FIRST_MATCH = 1;
 const QUICKLOAD_SPEED = 100;
 const UPDATE_POST_TIMEOUT_LENGTH = 60000;
 
@@ -498,7 +499,7 @@ function buildQuickload() {
       
       $.each(settings.history, function(index, value) {
         if (count++ <= QUICKLOAD_MAX_ITEMS) {
-          var shortenMatches = ARTICLE_SHORTEN_REGEX.exec(value.url);
+          var shortenMatch = ARTICLE_SHORTEN_REGEX.exec(value.url)[FIRST_MATCH];
           var temp = formatDate(value.timestamp);
 
           if (temp !== date) {
@@ -509,7 +510,7 @@ function buildQuickload() {
           $ul = $("li:first ul", $ul)
             .prepend($("<li>")
                 .append($("<a>").attr("href", "http://reason.com/" + value.url + "#comment_" + value.permalink)
-                  .text(shortenMatches[1] + " (" + value.permalink + ")"))).parent().parent();
+                  .text(shortenMatch + " (" + value.permalink + ")"))).parent().parent();
         }
       });
       var $quickload = $("<div>").attr("id", "ableQuick")

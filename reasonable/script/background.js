@@ -4,7 +4,8 @@ const DAYS_TO_MILLISECONDS = 86400000;
 var trolls;
 var STEVE_SMITH_quotes = [];
 
-function RANDOM_STEVE_SMITH_QUOTE() {
+function random_STEVE_SMITH_quote() {
+  // Randomly generate STEVE SMITH quote
   return STEVE_SMITH_quotes[Math.floor(Math.random() * STEVE_SMITH_quotes.length)];
 }
 
@@ -126,8 +127,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       });
       break;
     case "STEVE_SMITH":
-      // Randomly generate STEVE SMITH quote
-      sendResponse(RANDOM_STEVE_SMITH_QUOTE());
+      sendResponse(random_STEVE_SMITH_quote());
       break;
     case "check_STEVE_SMITH":
       var temp = false;
