@@ -2,7 +2,7 @@ const STEVE_SMITH_URL = "http://www.brymck.com/reasonable/get?what=STEVE_SMITH";
 const SUBMIT_DAYS = 3;
 const DAYS_TO_MILLISECONDS = 86400000;
 var trolls;
-var steveSmithQuotes = [];
+var STEVE_SMITH_quotes = [];
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   switch (request.type) {
@@ -123,7 +123,34 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       break;
     case "STEVE_SMITH":
       // Randomly generate STEVE SMITH quote
-      sendResponse(steveSmithQuotes[Math.floor(Math.random() * steveSmithQuotes.length)]);
+      sendResponse(STEVE_SMITH_quotes[Math.floor(Math.random() * STEVE_SMITH_quotes.length)]);
+      break;
+    case "check_STEVE_SMITH":
+      var temp = false;
+      $.each(STEVE_SMITH_quotes, function(index, value) {
+        console.log("value: " + value + ", request.quote: " + request.quote);
+        if (value === request.quote) {
+          temp = true;
+        }
+      });
+      sendResponse(temp);
+      break;
+    case "submit_STEVE_SMITH":
+      $.ajax({
+        url: STEVE_SMITH_GIVE_URL,
+        type: "post",
+        data: {
+          "what": "STEVE_SMITH",
+          "quote": request.quote
+        },
+        success: function(data) {
+          // success handler
+        },
+        error: function() {
+          // error handler
+        }
+      });
+      sendResponse({});
       break;
     default:
       sendResponse({}); // snub
@@ -226,7 +253,7 @@ $.ajax({
   url: STEVE_SMITH_URL,
   dataType: "json",
   success: function(data) {
-    steveSmithQuotes = data;
+    STEVE_SMITH_quotes = data;
   },
   error: function() {
     // Error handler

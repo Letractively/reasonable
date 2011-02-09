@@ -325,6 +325,24 @@ function viewThread() {
       }
     }).text(IGNORE);
     $(this).append($pipe).append($show).append($pipe.clone()).append($ignore);
+    if (settings.STEVE_SMITH && name === "STEVE SMITH") {
+      var $this = $(this);
+      var quote = "";
+      $this.siblings("p").each(function() {
+        if (quote !== "") {
+          quote += " ";
+        }
+        quote += $(this).text();
+      });
+      chrome.extension.sendRequest({type: "check_STEVE_SMITH", "quote": quote}, function(response) {
+        if (!response) {
+          var $STEVE_QUOTE = $("<a>").addClass("able_STEVE_SMITH").click(function() {
+            chrome.extension.sendRequest({type: "submit_STEVE_SMITH", "quote": quote});
+          }).text("ADD TO QUOTES");
+          $this.append($pipe.clone()).append($STEVE_QUOTE);
+        }
+      });
+    }
   });
 }
 

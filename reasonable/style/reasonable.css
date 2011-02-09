@@ -21,7 +21,7 @@ div.post div.ablePic > img {
 div.ableHighlight {
   background-color: #eee;
 }
-.ableShow, .ignore {
+.ableShow, .ignore, .able_STEVE_SMITH {
   cursor: pointer;
 }
 
