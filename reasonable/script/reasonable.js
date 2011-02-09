@@ -337,7 +337,9 @@ function viewThread() {
       chrome.extension.sendRequest({type: "check_STEVE_SMITH", "quote": quote}, function(response) {
         if (!response) {
           var $STEVE_QUOTE = $("<a>").addClass("able_STEVE_SMITH").click(function() {
-            chrome.extension.sendRequest({type: "submit_STEVE_SMITH", "quote": quote});
+            chrome.extension.sendRequest({type: "submit_STEVE_SMITH", "quote": quote}, function() {
+              alert("Added! STEVE SMITH's wisdom will appear for everyone's viewing pleasure in the near future!");
+            });
           }).text("ADD TO QUOTES");
           $this.append($pipe.clone()).append($STEVE_QUOTE);
         }
