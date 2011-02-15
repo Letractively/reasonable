@@ -1,14 +1,17 @@
+// Copyright 2011 Bryan McKelvey
+
 // Get domain name from URL
-const URL_REGEX = /^https?:\/\/(www\.)?([^\/]+)?/i;
+var URL_REGEX = /^https?:\/\/(www\.)?([^\/]+)?/i;
 
 // Picture regex is based on RFC 2396. It doesn't require a prefix and allows ? and # suffixes.
-const PICTURE_REGEX = /(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
+var PICTURE_REGEX = /(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
 
 // Pretty strict filter. May want to revise for linking to someone's profile page.
-const YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
+var YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
 
 // Article URL regular expressions
 const ARTICLE_REGEX = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
+
 const ARTICLE_SHORTEN_REGEX = /^(?:archives|blog)?\/(?:19|20)[0-9]{2}\/(?:0[1-9]|1[0-2])\/(?:0[1-9]|[12][0-9]|3[0-1])\/(.*?)(?:\#|$)/;
 
 // Search for all caps
@@ -349,6 +352,7 @@ function viewThread() {
       quote = quote.replace(/\n/gi, " ");
       
       // Test post content against STEVE SMITH regex
+      /*
       if (STEVE_SMITH_REGEX.test(quote)) {
         var $this = $(this);
         chrome.extension.sendRequest({type: "check_STEVE_SMITH", "quote": quote}, function(response) {
@@ -362,6 +366,7 @@ function viewThread() {
           }
         });
       }
+      */
     }
   });
 }
