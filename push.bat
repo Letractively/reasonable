@@ -6,6 +6,9 @@ echo.
 echo Determing which files were added and removed...
 hg addremove
 echo.
+echo Changes:
+hg status
+echo.
 set /p message=Commit message: 
 hg commit -m "%message%"
 echo.

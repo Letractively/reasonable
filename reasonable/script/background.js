@@ -1,13 +1,6 @@
-const STEVE_SMITH_URL = "http://www.brymck.com/reasonable/get?what=STEVE_SMITH";
 const SUBMIT_DAYS = 3;
 const DAYS_TO_MILLISECONDS = 86400000;
 var trolls;
-var STEVE_SMITH_quotes = [];
-
-function random_STEVE_SMITH_quote() {
-  // Randomly generate STEVE SMITH quote
-  return STEVE_SMITH_quotes[Math.floor(Math.random() * STEVE_SMITH_quotes.length)];
-}
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   switch (request.type) {
@@ -69,10 +62,6 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       });
       sendResponse({success: true});
       break;
-    case "setSearch":
-      localStorage.name = request.name;
-      sendResponse({success: true});
-      break;
     case "keepHistory":
       var temp;
       var datetime = new Date();
@@ -126,37 +115,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         }
       });
       break;
-    case "STEVE_SMITH":
-      sendResponse(random_STEVE_SMITH_quote());
-      break;
-    case "check_STEVE_SMITH":
-      var temp = false;
-      $.each(STEVE_SMITH_quotes, function(index, value) {
-        console.log("value: " + value + ", request.quote: " + request.quote);
-        if (value === request.quote) {
-          temp = true;
-        }
-      });
-      sendResponse(temp);
-      break;
-    case "submit_STEVE_SMITH":
-      $.ajax({
-        url: STEVE_SMITH_GIVE_URL,
-        type: "post",
-        data: {
-          "what": "STEVE_SMITH",
-          "quote": request.quote
-        },
-        success: function(data) {
-          // success handler
-        },
-        error: function() {
-          // error handler
-        }
-      });
-      sendResponse({});
-      break;
-    default:
+     default:
       sendResponse({}); // snub
       break;
   }
@@ -249,17 +208,5 @@ $.ajax({
   },
   error: function() {
     trolls = {};
-  }
-});
-
-// Get updated list of STEVE SMITH quotes
-$.ajax({
-  url: STEVE_SMITH_URL,
-  dataType: "json",
-  success: function(data) {
-    STEVE_SMITH_quotes = data;
-  },
-  error: function() {
-    // Error handler
   }
 });

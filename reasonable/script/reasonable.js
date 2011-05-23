@@ -11,19 +11,13 @@ var YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0
 
 // Article URL regular expressions
 const ARTICLE_REGEX = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
-
 const ARTICLE_SHORTEN_REGEX = /^(?:archives|blog)?\/(?:19|20)[0-9]{2}\/(?:0[1-9]|1[0-2])\/(?:0[1-9]|[12][0-9]|3[0-1])\/(.*?)(?:\#|$)/;
-
-// Search for all caps
-const STEVE_SMITH_REGEX = /^[^a-z]*$/;
-const STEVE_SMITH_FREQUENCY = 0.01;
 
 // Post labels
 const COLLAPSE = "show direct";
 const UNCOLLAPSE = "show all";
 const IGNORE = "ignore";
 const UNIGNORE = "unignore";
-const ADD_STEVE_SMITH = "ADD";
 
 // Avatars
 const AVATAR_PREFIX = "http://www.gravatar.com/avatar/";
@@ -59,7 +53,7 @@ var defaultSettings = {
   "showGravatar": false,
   "blockIframes": false,
   "updatePosts": false,
-  "STEVE_SMITH": true
+  "name": ""
 };
 var months = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
@@ -341,33 +335,6 @@ function viewThread() {
       }
     }).text(IGNORE);
     $(this).append($pipe).append($show).append($pipe.clone()).append($ignore);
-    if (settings.STEVE_SMITH) {
-      // Get content of post
-      var quote = "";
-      $(this).siblings("p").each(function() {
-        quote += (quote !== "" ? " " : "") + $(this).text();
-      });
-
-      // Replace newlines
-      quote = quote.replace(/\n/gi, " ");
-      
-      // Test post content against STEVE SMITH regex
-      /*
-      if (STEVE_SMITH_REGEX.test(quote)) {
-        var $this = $(this);
-        chrome.extension.sendRequest({type: "check_STEVE_SMITH", "quote": quote}, function(response) {
-          if (!response) {
-            var $STEVE_QUOTE = $("<a>").addClass("able_STEVE_SMITH").click(function() {
-              chrome.extension.sendRequest({type: "submit_STEVE_SMITH", "quote": quote}, function() {
-                alert("Added! STEVE SMITH's wisdom will appear for everyone's viewing pleasure in the near future!");
-              });
-            }).text(ADD_STEVE_SMITH);
-            $this.append($pipe.clone()).append($STEVE_QUOTE);
-          }
-        });
-      }
-      */
-    }
   });
 }
 
@@ -434,14 +401,6 @@ function blockTrolls(smoothTransitions) {
         $this.siblings("a.ignore").hide().prev("span.pipe").hide();
       }
 
-      // Show STEVE SMITH quotes randomly
-      if (Math.random() < STEVE_SMITH_FREQUENCY) {
-        chrome.extension.sendRequest({type: "STEVE_SMITH"}, function(response) {
-          var $div = $this.closest("div");
-          $div.children("div.commentactions").before($("<p>").addClass("STEVE_SMITH").html(response));
-        });
-      }
-
       if (smoothTransitions) {
         $body.slideUp();
       } else {
@@ -449,7 +408,7 @@ function blockTrolls(smoothTransitions) {
       }
     } else if (smoothTransitions && $ignore.text() === UNIGNORE) {
       // Unhide unignored trolls
-      $this.siblings("a.ignore").text(IGNORE).closest("div").removeClass("troll").children("p, blockquote").slideDown().siblings("p.STEVE_SMITH").remove();
+      $this.siblings("a.ignore").text(IGNORE).closest("div").removeClass("troll").children("p, blockquote").slideDown();
     }
   });
 }
@@ -551,14 +510,6 @@ function historyAndHighlight() {
   if (settings.keepHistory || settings.highlightMe) {
     var permalink = 0;
  
-    $("input.submit").click(function() {
-      var $form = $(this).closest("form");
-      chrome.extension.sendRequest({
-        type: "setSearch",
-        name: $(this).closest("form").children("input:first").val()
-      });
-    });
-        
     if (settings.name != "null" && settings.name != "") {
         $("h2.commentheader > strong:contains('" + settings.name + "') ~ a.permalink").each(function() {
           if (settings.keepHistory) {
@@ -591,35 +542,6 @@ function historyAndHighlight() {
   }
 }
 
-function SUMMON_STEVE_SMITH() {
-  if (settings.STEVE_SMITH) {
-    // WEAK STEPHEN J. SMITH BECOME STRONG STEVE SMITH
-    var $context = $("a[rel='author'][href$='stephen-smith']").text("STEVE SMITH").closest("div.post");
-    
-    var $singleArticleEnd = $("div.entry > p:last", $context);
-    if ($singleArticleEnd.size() > 0) {
-      // ONLY ONE PERSON COME TO STEVE SMITH CABIN
-      chrome.extension.sendRequest({type: "STEVE_SMITH"}, function(response) {
-        var $nextBlockquote = $singleArticleEnd.next("blockquote");
-        if ($nextBlockquote.size() > 0) {
-          $nextBlockquote.after($("<p>").text(response));
-        } else {
-          $singleArticleEnd.after($("<p>").text(response));
-        }
-      })
-    } else {
-      // IT A PARTY IF YOU KNOW WHAT STEVE SMITH MEAN
-      $("p:not([class]):last", $context).each(function() {
-        var $this = $(this);
-        chrome.extension.sendRequest({type: "STEVE_SMITH"}, function(response) {
-          $this.after($("<p>").text(response));
-        })
-      });
-    }
-  }
-  // STEVE SMITH VERY GOOD FOREST LAWYER
-}
-
 // Main routine
 // Only run these if there is a comment section displayed
 var commentOnlyRoutines = function() {
@@ -638,7 +560,6 @@ chrome.extension.sendRequest({type: "settings"}, function(response) {
   lightsOut();
   altText();
   showMedia();
-  SUMMON_STEVE_SMITH();
 
   // Run automatically if comments are open, otherwise bind to the click
   // event for the comment opener link

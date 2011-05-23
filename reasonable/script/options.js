@@ -105,6 +105,9 @@ function load() {
             $option.append(buildTroll(tkey, tvalue));
           });
           break;
+        case "name":
+          $option.val(value == null ? "" : value);
+          break;
         default:
           // Assumes the default is a checkbox
           $option.attr("checked", value == "true");
@@ -127,6 +130,10 @@ function save() {
   $("#options input[type=checkbox]").each(function() {
     var $this = $(this);
     temp[$this.attr("id")] = Boolean($this.attr("checked"));
+  });
+  $("#options input[type=text]").each(function() {
+    var $this = $(this);
+    temp[$this.attr("id")] = $this.val();
   });
   $("input:radio:checked").each(function() {
     tempTrolls[$(this).attr("name")] = $(this).val();
@@ -164,5 +171,3 @@ $(document).ready(function() {
     }
   });
 });
-
-$("li:has(input#STEVE_SMITH)").attr("title", chrome.extension.getBackgroundPage().random_STEVE_SMITH_quote());
