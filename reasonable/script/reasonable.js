@@ -7,7 +7,7 @@ var URL_REGEX = /^https?:\/\/(www\.)?([^\/]+)?/i;
 var PICTURE_REGEX = /(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
 
 // Pretty strict filter. May want to revise for linking to someone's profile page.
-var YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)/i;
+var YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)(?:\#t\=[0-9]{2}m[0-9]{2}s)?/i;
 
 // Article URL regular expressions
 const ARTICLE_REGEX = /reason\.com\/(.*?)(?:\#comment)?s?(?:\_[0-9]{6,7})?$/;
@@ -499,8 +499,7 @@ function buildQuickload() {
       var $quickload = $("<div>").attr("id", "ableQuick")
         .append($("<h3>").text(COMMENT_HISTORY))
         .append($ul)
-        .hover(function() { $ul.slideDown(QUICKLOAD_SPEED); }, function() { $ul.slideUp(QUICKLOAD_SPEED); })
-        .topRight().keepInTopRight();
+        .hover(function() { $ul.slideDown(QUICKLOAD_SPEED); }, function() { $ul.slideUp(QUICKLOAD_SPEED); });
       $("body").append($quickload.append($ul));
     }
   }

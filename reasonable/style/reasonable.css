@@ -87,7 +87,7 @@ img.ableGravatar {
   cursor: pointer;
   font-size: 11px;
   margin-right: 4px;
-  position: absolute;
+  position: fixed;
   opacity: 0.5;
   right: 0px;
   top: 0px;
