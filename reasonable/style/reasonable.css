@@ -136,10 +136,7 @@ img.ableGravatar {
   display: block;
 }
 .ableInsert {
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABPElEQVQ4jZWSO0sDQRSFv5m83PjAQHwVIr4lnVZaqCBiaW9lo52If8D/YCEWATt/hYVoJQh2qWxEUEQtEliN7JrZsZjEDcxqxtPMcOfOuefecwVt0HsFjQPEcVW07tLlww/CTyv0P4IE2AQJVf5C+tcXrSHwm3dApkDY9ZIJdAS5Hljfh+AdsnmoV+Gy7EgQKch6sHkIsplyfwMXJ1Zq8hBTafBf4akSxx5uoWG7bCvQGoIPo8J/i+O1ZwjtWraCXDes7sLYAhTH4/jwLJSWYHGrgwIVAgJmluH6zCgREqIGTMw7tKC+4KoMQoBSICUMTRsbHyuQ7+9AgDAWgrFTR5DpgowHXp/DDFrQkTnn1mBwCl7uzHA7tgDGCSFh4wBGSqaNgUk4P3IlUFAYhXoNTrfNMq3sQG/RbGYbvgEsV1VxTllp3wAAAABJRU5ErkJggg==);
-  background-repeat: no-repeat;
   font-size: 87.5%;
-  padding-left: 16px;
 }
 .ableInsert .pipe {
   padding: 0 1px;
