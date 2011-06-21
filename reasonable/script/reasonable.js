@@ -570,9 +570,13 @@ function buildQuickInsert() {
     $textarea.before($("<div>").addClass("ableInsert")
       .append($("<a>").attr("href", "#").text("link").click(function() { return quickInsert("a", {"URL": "href"}, $textarea); }))
       .append($("<span>").addClass("pipe").text(" | "))
+      .append($("<a>").attr("href", "#").text("quote").click(function() { return quickInsert("blockquote", null, $textarea); }))
+      .append($("<span>").addClass("pipe").text(" | "))
       .append($("<a>").attr("href", "#").text("bold").click(function() { return quickInsert("b", null, $textarea); }))
       .append($("<span>").addClass("pipe").text(" | "))
-      .append($("<a>").attr("href", "#").text("italic").click(function() { return quickInsert("i", null, $textarea); })));
+      .append($("<a>").attr("href", "#").text("italic").click(function() { return quickInsert("i", null, $textarea); }))
+      .append($("<span>").addClass("pipe").text(" | "))
+      .append($("<a>").attr("href", "#").text("strike").click(function() { return quickInsert("s", null, $textarea); })));
   };
 
   $("textarea").each(function() {
