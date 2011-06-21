@@ -4,7 +4,7 @@
 var URL_REGEX = /^https?:\/\/(www\.)?([^\/]+)?/i;
 
 // Picture regex is based on RFC 2396. It doesn't require a prefix and allows ? and # suffixes.
-var PICTURE_REGEX = /(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
+var PICTURE_REGEX = /(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpe?g|gif|png|bmp))(?:\?([^#]*))?(?:#(.*))?/i;
 
 // Pretty strict filter. May want to revise for linking to someone's profile page.
 var YOUTUBE_REGEX = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9-_]+)(?:\#t\=[0-9]{2}m[0-9]{2}s)?/i;
