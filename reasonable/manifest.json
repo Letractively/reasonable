@@ -4,7 +4,7 @@
       "all_frames": true,
       "js": [
         "/script/const.js",
-        "/script/jquery-1.4.4.min.js",
+        "/script/jquery-1.6.1.min.js",
         "/script/jquery.brymck.js",
         "/script/preload.js"
       ],
@@ -34,6 +34,6 @@
    "permissions": [
     "tabs",
     "http://www.brymck.com/reasonable/"
-  ],
-   "version": "1.4.8"
+   ],
+   "version": "1.5"
 }

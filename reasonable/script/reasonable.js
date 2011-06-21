@@ -541,6 +541,48 @@ function historyAndHighlight() {
   }
 }
 
+function quickInsert(tag, attrs, $textarea) {
+  // Get beginning, middle and end of text selected
+  var textarea = $textarea[0];
+  var text = $textarea.val();
+  var startPos = textarea.selectionStart;
+  var endPos = textarea.selectionEnd;
+  var startText = text.substr(0, startPos);
+  var midText = text.substr(startPos, endPos - startPos);
+  var endText = text.substr(endPos);
+
+  var startTag = "<" + tag;
+  var endTag = "</" + tag + ">";
+  if (attrs !== null) {
+    $.each(attrs, function(name, attr) {
+      startTag += " " + attr + "=\"" + prompt("Enter " + name + ":") + "\"";
+    });
+  }
+  startTag += ">";
+  $textarea.val(startText + startTag + midText + endTag + endText).focus();
+  textarea.selectionStart = startPos + startTag.length;
+  textarea.selectionEnd = endPos + startTag.length;
+  return false; // prevent going to # anchor
+}
+
+function buildQuickInsert() {
+  var buildToolbar = function($textarea) {
+    $textarea.before($("<div>").addClass("ableInsert")
+      .append($("<a>").attr("href", "#").text("link").click(function() { return quickInsert("a", {"URL": "href"}, $textarea); }))
+      .append($("<span>").addClass("pipe").text(" | "))
+      .append($("<a>").attr("href", "#").text("bold").click(function() { return quickInsert("b", null, $textarea); }))
+      .append($("<span>").addClass("pipe").text(" | "))
+      .append($("<a>").attr("href", "#").text("italic").click(function() { return quickInsert("i", null, $textarea); })));
+  };
+
+  $("textarea").each(function() {
+    buildToolbar($(this));
+  });
+  $(".comment_reply.submit").click(function() {
+    buildToolbar($(this).parent().next(".leave-comment.reply").find("textarea"));
+  });
+}
+
 // Main routine
 // Only run these if there is a comment section displayed
 var commentOnlyRoutines = function() {
@@ -559,6 +601,7 @@ chrome.extension.sendRequest({type: "settings"}, function(response) {
   lightsOut();
   altText();
   showMedia();
+  buildQuickInsert();
 
   // Run automatically if comments are open, otherwise bind to the click
   // event for the comment opener link
